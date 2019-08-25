@@ -1,11 +1,36 @@
 const TelegramBot = require('node-telegram-bot-api');
-
 const TOKEN = "869793649:AAFpPGkJ1Q7XUMmENONXuzQPmPgktGb7C9A";
-
-
 const bot = new TelegramBot(TOKEN, {polling: true});
+const inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
-bot.on("message",msg=>{
+let keyboard = {
+   inline_keyboard: [
+      ['Google','http://google.com'],
+      ['Ysndex','http://yandex.ru'],
+   ]
+}
+
+
+bot.on("message",msg => {
    bot.sendMessage(msg.chat.id,`Вас привествует бот ШАРОЛАНДИИ, бот говорит: ${msg.from.first_name}`);
+   
 });
+
+bot.sendMessage(msg.chat.id,startMessage, keyboard);
+
+// Фронт:
+//
+// приветсвие  = выбор города
+// цены        = витрина фотографии шариков из БД (кнопка назад кнопка добавить в корзину
+// конструктор = шарика
+// сроки       = исполнения передача в производство
+// корзина     = список товаров с ценами и количеством + номер заказа + номер контакта + имя
+// оплата      = 30%
+//
+//     Бэк:
+//
+// таблица товаров =  id-товара название размер фото
+// таблица заказов = id-заказа дата-заказа id-шара количество цвет коментарий имя-клиента телефон
+// таблица архив = id-заказа исполено-ли
+
 
