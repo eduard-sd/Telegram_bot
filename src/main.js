@@ -5,8 +5,14 @@ const inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
 let keyboard = {
    inline_keyboard: [
-      ['Google','http://google.com'],
-      ['Ysndex','http://yandex.ru'],
+      {
+         text: 'Google',
+         url: 'http://google.com'
+      },
+      {
+         text: 'Ysndex',
+         url: 'http://yandex.ru'
+      }
    ]
 }
 
@@ -32,5 +38,6 @@ bot.sendMessage(msg.chat.id,startMessage, keyboard);
 // таблица товаров =  id-товара название размер фото
 // таблица заказов = id-заказа дата-заказа id-шара количество цвет коментарий имя-клиента телефон
 // таблица архив = id-заказа исполено-ли
+//ssh 12345
 
 
