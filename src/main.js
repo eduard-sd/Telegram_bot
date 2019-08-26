@@ -5,21 +5,23 @@ const bot = new TelegramBot(TOKEN, {polling: true});
 
 
 bot.onText(/\/start/, function (msg) {
-   let keyboard = {
-      reply_markup: {
-         inline_keyboard: [
-            {
-               text: 'Google',
-               url: 'http://google.com'
-            },
-            {
-               text: 'Ysndex',
-               url: 'http://yandex.ru'
-            }
-         ]
-      }
-   };
-   bot.sendMessage(msg.chat.id,startMessage, keyboard);
+
+    let startMessage = 'Приветствие';
+    let keyboard = {
+        reply_markup: {
+            inline_keyboard: [
+        {
+           text: 'Google',
+           url: 'http://google.com'
+        },
+        {
+           text: 'Ysndex',
+           url: 'http://yandex.ru'
+        }
+        ]
+        }
+    };
+    bot.sendMessage(msg.chat.id,startMessage, keyboard);
 });
 
 
