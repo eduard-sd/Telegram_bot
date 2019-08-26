@@ -2,18 +2,22 @@ const TelegramBot = require('node-telegram-bot-api');
 const TOKEN = "869793649:AAFpPGkJ1Q7XUMmENONXuzQPmPgktGb7C9A";
 const bot = new TelegramBot(TOKEN, {polling: true});
 // const inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+
 bot.onText(/\/start/, function (msg) {
    let keyboard = {
-      inline_keyboard: [
-         {
-            text: 'Google',
-            url: 'http://google.com'
-         },
-         {
-            text: 'Ysndex',
-            url: 'http://yandex.ru'
-         }
-      ]
+      reply_markup: {
+         inline_keyboard: [
+            {
+               text: 'Google',
+               url: 'http://google.com'
+            },
+            {
+               text: 'Ysndex',
+               url: 'http://yandex.ru'
+            }
+         ]
+      }
    };
    bot.sendMessage(msg.chat.id,startMessage, keyboard);
 });
