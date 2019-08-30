@@ -1,4 +1,11 @@
-const TelegramBot = require('node-telegram-bot-api');
+// try {
+//     const TelegramBot = require('node-telegram-bot-api');
+//     console.log('1');
+// } catch (e) {
+//     console.log(e);
+// }
+
+
 const TOKEN = "869793649:AAFpPGkJ1Q7XUMmENONXuzQPmPgktGb7C9A";
 const bot = new TelegramBot(TOKEN, {polling: {interval: 1000}});
 
