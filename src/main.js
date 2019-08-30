@@ -1,9 +1,6 @@
-// try {
-//     const TelegramBot = require('node-telegram-bot-api');
-//     console.log('1');
-// } catch (e) {
-//     console.log(e);
-// }
+
+const TelegramBot = require('node-telegram-bot-api');
+
 
 
 const TOKEN = "869793649:AAFpPGkJ1Q7XUMmENONXuzQPmPgktGb7C9A";
