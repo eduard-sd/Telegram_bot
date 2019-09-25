@@ -1,17 +1,17 @@
 {
-  "name" : "telegrambot",
-  "version" : "1.0.0",
-  "description" : "",
-  "main" : "main.js",
-  "scripts" : {
-    "start" : "node main.js"
+  "name": "telegrambot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
   },
-  "engines" : {
-    "node" : "10.16.0"
+  "engines": {
+    "node": "10.16.0"
   },
-  "author" : "",
-  "license" : "ISC",
-  "dependencies" : {
-    "node-telegram-bot-api" : "^0.30.0"
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0"
   }
 }
