@@ -13,9 +13,11 @@ bot.on('text', (msg) => {
     const chatOpponent = chatValue.first_name;
 
     if(msg.text.toString() === "/start") {
-        bot.sendMessage(chatId,
+        bot.sendMessage(
+            chatId,
             `${chatOpponent}, добрый день! Вас приветсвует автоматичекский помошник в подготовке праздников. Прошу сделать выбор, что вас интересует?`,
-            keyboardDefault)
+            {reply_markup: keyboardDefault}
+        )
     }
 
     if (msg.text.toString() === "Шары 🎈") {
@@ -23,7 +25,7 @@ bot.on('text', (msg) => {
         bot.sendMessage(
             chatId,
             `${chatOpponent}, Вы нажали шары вводная общая информация о услугам`,
-            keyboardBalloons
+            {reply_markup: keyboardBalloons}
         );
     } else if (msg.text.toString() === "Торты 🎂") {
 
@@ -31,69 +33,22 @@ bot.on('text', (msg) => {
         bot.sendMessage(chatId, "Вы нажали Кэшбэк")
     } else if (msg.text.toString() === "Корзина 🛒") {
         bot.sendMessage(chatId, "Вы нажали Корзина")
+    } else if (msg.text.toString() === "ИНФО") {
+        bot.sendMessage(chatId, "Вы нажали ИНФО")
     }
 });
-
-
-
-// bot.on("text", function (reply) {
-//     if (reply.text === "Шары 🎈") {
-//         bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
-//         bot.sendMessage(
-//             chatId,
-//             `${chatOpponent}, Вы нажали шары вводная общая информация о услугам`,
-//             {
-//                 reply_markup: {
-//                     inline_keyboard: [
-//                         [{text: "Каталог и цены", callback_data: "Каталог и цены"}, {
-//                             text: "Стоимость по фото",
-//                             url: "www.google.com"
-//                         }],
-//                         [{text: "Кэшбэк", url: "www.google.com"}, {text: "Корзина", url: "www.google.com"}],
-//                         [{text: "⬅ Назад", url: "www.google.com"}, {text: "ИНФО", url: "www.google.com"}]
-//                     ]
-//                 }
-//             }
-//         );
-    // } else if (reply.text === "Торты 🎂") {
-    //
-    // } else if (reply.text === "Кэшбэк 💰") {
-    //     bot.sendMessage(chatId, "Вы нажали Кэшбэк")
-    // } else if (reply.text === "Корзина 🛒") {
-    //     bot.sendMessage(chatId, "Вы нажали Корзина")
-    // }
-// });
-
-
-
-
-// bot.sendMessage(
-//     chatId,
-//     `${chatOpponent}, *bold text*_italic text_`,
-//     {
-//         parse_mode:"markdown",
-//         reply_markup: {
-//             inline_keyboard: [
-//                 [{text: "Каталог и цены",url: "www.google.com"},{text: "Стоимость по фото",url: "www.google.com"}],
-//                 [{text: "Кэшбэк",url: "www.google.com"},{text: "Корзина",url: "www.google.com"}],
-//                 [{text: "⬅ Назад",url: "www.google.com"},{text: "ИНФО",url: "www.google.com"}]
-//             ]
-//         }
-//     }
-// );
 
 bot.on("callback_query", (msg) => {
 
     console.log(msg);
-    const fromId = msg.from.id;
     const chatValue = msg.message.chat;
     const chatId = chatValue.id;
     const chatOpponent = chatValue.first_name;
     const messageId = msg.message.message_id;
 
-    bot.sendMessage(chatId,
-        `${msg.data} -- callbackquery кнопка`,
-        {reply_markup: {}});
+    // bot.sendMessage(chatId,
+    //     `${msg.data} -- callbackquery кнопка`,
+    //     {reply_markup: {}});
 
 
 
@@ -101,7 +56,7 @@ bot.on("callback_query", (msg) => {
         // bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
         bot.editMessageText(
             `${chatOpponent}, Вы нажали шары вводная общая информация о услугам`,
-            keyboardBalloons
+            {chat_id: chatId, message_id: messageId, reply_markup: keyboardBalloons}
         );
     } else if (msg.data.toString() === "Торты 🎂") {
 
@@ -111,20 +66,17 @@ bot.on("callback_query", (msg) => {
         bot.editMessageText(chatId, "Вы нажали Корзина")
     }
 
-    if (msg.data === "Каталог и цены") {
-        console.log(chatId);
-        bot.editMessageText('hi', {chat_id: chatId, message_id: messageId});
-        let one = JSON.stringify(priceList);
-        bot.editMessageReplyMarkup({chat_id: chatId, message_Id: messageId, one});
+    if (msg.data.toString() === "Каталог и цены") {
+        // console.log(chatId);
+        bot.editMessageText('Вы открыли каталог и цены', {chat_id: chatId, message_id: messageId, reply_markup: priceList});
+    } else if (msg.data.toString() === "Стоимость по фото") {
+        bot.editMessageText('Пожалуйста загрузите понравившиеся фотографии из интернета. Нажмите отправить и с вами с свяжется специались после подсчета стоимости композиции', {chat_id: chatId, message_id: messageId, reply_markup: priceList});
+    } else if (msg.data.toString() === "Кэшбэк 💰") {
 
+    } else if (msg.data.toString() === "Корзина 🛒") {
 
-        // bot.editMessageText(
-        //     {
-        //         chatId,
-        //         `${chatOpponent}, пожалуйста укажите какие воздушные шары вас интересуют`,
-        //          priceList
-        //
-        // )
+    } else if (msg.data.toString() === "ИНФО") {
+
     }
 });
 
