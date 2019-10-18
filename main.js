@@ -11,8 +11,10 @@ const faqKeyboard = keyboard.faqKeyboard();
 const cartKeyboard = keyboard.cartKeyboard();
 const profileKeyboard = keyboard.profileKeyboard();
 
-let previousMenu = 'Шары 🎈';
+const photoList = new Set();
 const adminChatID = '1875888';
+let previousMenu = 'Шары 🎈';
+
 
 
 function addBackButton(previousMenu, customKeyboard) {
@@ -26,76 +28,6 @@ function addBackButton(previousMenu, customKeyboard) {
     }
     return {inline_keyboard: customKeyboardArray};
 }
-
-bot.on('photo', (msg) => {
-    console.log(msg.photo.length);
-        console.log(msg);
-    //получено от
-    const photoList = msg.photo;
-    const fromName= msg.from.first_name;
-    const fromLastName= msg.from.last_name;
-    const fromId = msg.from.id;
-    const fromUsername= msg.from.username;
-
-    bot.sendMessage(
-        adminChatID,
-        `
-            <b>Босс у нас новый клиент!</b>
-        Просит сосчитать стоимость по фото.
-
-        <b>ФИО:</b> ${fromName} ${fromLastName}
-        <b>Ник телеграмм:</b> ${fromUsername}
-        <b>Фото:</b> ${fromId}
-        `,
-        {parse_mode:'HTML'},
-    );
-
-    // for (let i = 0; i < photoList.length ; i++) {
-    //     let fileId = photoList[i].file_id;
-    //     bot.sendPhoto(adminChatID,fileId);
-    //
-    // }
-
-
-    let fileId = photoList.shift().file_id;
-    console.log(fileId);
-    bot.sendPhoto(adminChatID,fileId);
-});
-
-// function resendFoto (object) {
-//     console.log(msg);
-//     //получено от
-//     const photoList = msg.photo;
-//     const fromName= msg.from.first_name;
-//     const fromLastName= msg.from.last_name;
-//     const fromUsername= msg.from.username;
-//
-//     bot.sendMessage(
-//         adminChatID,
-//         `
-//             <b>Босс у нас новый клиент!</b>
-//         Просит сосчитать стоимость по фото.
-//
-//         <b>ФИО:</b> ${fromName} ${fromLastName}
-//         <b>Ник телеграмм:</b> ${fromUsername}
-//         <b>Фото:</b>
-//         `,
-//         {parse_mode:'HTML'},
-//     );
-//
-//     // for (let i = 0; i < photoList.length ; i++) {
-//     //     let fileId = photoList[i].file_id;
-//     //     bot.sendPhoto(adminChatID,fileId);
-//     //
-//     // }
-//
-//
-//     let fileId = photoList.shift().file_id;
-//     console.log(fileId);
-//     bot.sendPhoto(adminChatID,fileId);
-// };
-
-
 
 bot.on('text', (msg) => {
     const chatValue = msg.chat;
@@ -124,6 +56,8 @@ bot.on('text', (msg) => {
 
     }
 });
+
+
 
 bot.on("callback_query", (msg) => {
 
@@ -168,7 +102,51 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,getPriceFromPhotoKeyboard)});
+                reply_markup: addBackButton(previousMenu,getPriceFromPhotoKeyboard)})
+            .then(()=>{
+                bot.on('photo', (msg) => {
+                    const photoObjectList = msg.photo;
+                    console.log(msg);
+
+                    if(photoObjectList){
+                        const fromName= msg.from.first_name;
+                        const fromLastName= msg.from.last_name;
+                        const fromUsername= msg.from.username;
+
+                        if(photoList.size === 0 ) {
+                            bot.sendMessage(
+                                adminChatID,
+                                `
+                <b>Босс у нас новый клиент!</b>
+            Просит сосчитать стоимость по фото.
+    
+            <b>ФИО:</b> ${fromName} ${fromLastName}
+            <b>Ник телеграмм:</b> ${fromUsername}
+            <b>Фото:</b>
+            `,
+                                {parse_mode:'HTML'},
+                            );
+                        }
+
+                        for (let i = 0; i < photoObjectList.length ; i++) {
+                            let fileId = photoObjectList[i].file_id;
+                            photoList.add(fileId);
+                        }
+                    }
+                });
+                setTimeout(
+                    ()=> {
+                        let myArr = Array.from(photoList);
+                        console.log(myArr);
+                        for (let i = 0; i < myArr.length ; i++) {
+                            let fileId = myArr[i];
+                            bot.sendPhoto(adminChatID,fileId);
+                        }
+                        photoList.clear();
+                    },
+                    60000
+                );
+            });
 
         previousMenu = "Стоимость по фото 🖼️";
 
