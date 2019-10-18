@@ -15,7 +15,22 @@ function keyboardDefault() {
         one_time_keyboard: true
     }
 }
+function sendVCard() {
+    return {
+        reply_markup: {
+            one_time_keyboard: true,
+            keyboard: [
+                [{text: "Мой номер телефона",request_contact: true}],
+                [{text:"Отмена"}]
+            ]
+        }
+    }
+}
 
+
+
+//инлайн клавиатуры
+//главное меню
 //"Шары 🎈"
 function balloonsKeyboard() {
     return {
@@ -98,6 +113,7 @@ function faqKeyboard() {
 
 
 module.exports.keyboardDefault = keyboardDefault;
+module.exports.sendVCard = sendVCard;
 module.exports.keyboardBalloons = balloonsKeyboard;
 module.exports.priceListKeyboard = priceListKeyboard;
 module.exports.getPriceFromPhotoKeyboard = getPriceFromPhotoKeyboard;

@@ -4,6 +4,7 @@ const bot = new TelegramBot(TOKEN, {polling: true});
 const keyboard = require('./keyboard/inlineKeyboard')
 
 const keyboardDefault = keyboard.keyboardDefault();
+const sendVCard = keyboard.sendVCard();
 const keyboardBalloons = keyboard.keyboardBalloons();
 const priceListKeyboard = keyboard.priceListKeyboard();
 const getPriceFromPhotoKeyboard = keyboard.getPriceFromPhotoKeyboard();
@@ -11,17 +12,17 @@ const faqKeyboard = keyboard.faqKeyboard();
 const cartKeyboard = keyboard.cartKeyboard();
 const profileKeyboard = keyboard.profileKeyboard();
 
-const photoList = new Set();
+let photoList = [];
 const adminChatID = '1875888';
 let previousMenu = 'Шары 🎈';
 
 
-
+//добавление кнопки назад в клавиатуру
 function addBackButton(previousMenu, customKeyboard) {
     let customKeyboardArray = customKeyboard.inline_keyboard;
     for (let i = 0; i < customKeyboardArray.length; i++) {
-        if(i === customKeyboardArray.length-1) {
-            if(customKeyboardArray[i][0].text !== "⬅ Назад") {
+        if (i === customKeyboardArray.length - 1) {
+            if (customKeyboardArray[i][0].text !== "⬅ Назад") {
                 customKeyboardArray[i].splice(0, 0, {text: "⬅ Назад", callback_data: previousMenu})
             }
         }
@@ -32,11 +33,11 @@ function addBackButton(previousMenu, customKeyboard) {
 bot.on('text', (msg) => {
     const chatValue = msg.chat;
     const chatId = msg.chat.id;
-    const chatOpponent = chatValue.first_name;
+    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент" ;
 
-    // console.log(msg);
+    console.log(chatOpponent);
 
-    if(msg.text.toString() === "/start") {
+    if (msg.text.toString() === "/start") {
         bot.sendMessage(
             chatId,
             `${chatOpponent}, добрый день! Вас приветсвует автоматичекский помошник в подготовке праздников. Прошу сделать выбор, что вас интересует?`,
@@ -45,16 +46,47 @@ bot.on('text', (msg) => {
     }
 
     if (msg.text.toString() === "Шары 🎈") {
-        bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
+        // bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
         bot.sendMessage(
             chatId,
-            `${chatOpponent}, Вы нажали шары вводная общая информация о услугам`,
-            {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+            '<a href="http://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200">alt</a>'+`\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
+            {
+                reply_markup: addBackButton(previousMenu, keyboardBalloons),
+                parse_mode: "HTML"
+            }
         );
         previousMenu = "Шары 🎈";
     } else if (msg.text.toString() === "Торты 🎂") {
 
+    } else if (msg.text.toString() === "Отмена") {
+        bot.sendMessage(
+            chatId,
+            `${chatOpponent}, вы нажали "отмена"`,
+            {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+        );
     }
+});
+
+bot.on('contact', (msg) => {
+    console.log(msg);
+    const chatId = msg.chat.id;
+    const fromName = msg.from.first_name;
+    const fromLastName = msg.from.last_name;
+    const fromUsername = msg.from.username;
+    const fromContact = msg.contact.phone_number;
+
+    bot.sendMessage(
+        chatId,
+        `${fromName}, приступаем к расчету...`,
+        {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+    );
+
+
+    bot.sendMessage(
+        adminChatID,
+        "<b>Босс у нас новый клиент!</b> \nПросит сосчитать стоимость по фото." + `\n\n<b>ФИО:</b> ${fromName} ${fromLastName} \n<b>Ник телеграмм:</b> ${fromUsername} \n<b>Телефон:</b> ${fromContact}`,
+        {parse_mode: 'HTML'},
+    );
 });
 
 
@@ -64,9 +96,8 @@ bot.on("callback_query", (msg) => {
     // console.log(msg);
     const chatValue = msg.message.chat;
     const chatId = chatValue.id;
-    const chatOpponent = chatValue.first_name;
+    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент" ;
     const messageId = msg.message.message_id;
-
 
 
     // bot.sendMessage(chatId,
@@ -75,74 +106,61 @@ bot.on("callback_query", (msg) => {
 
 
     if (msg.data.toString() === "Шары 🎈") {
-        bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
+        // bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
         bot.editMessageText(
-            `${chatOpponent}, Вы нажали шары вводная общая информация о услугам`,
+            '<a href="http://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200">alt</a>'+`\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,keyboardBalloons)});
+                reply_markup: addBackButton(previousMenu, keyboardBalloons),
+                parse_mode: "HTML"
+            });
 
         previousMenu = "Шары 🎈";
 
     } else if (msg.data.toString() === "Каталог и цены 🎁") {
         bot.editMessageText(
-            'Вы открыли каталог и цены',
+            `${chatOpponent}, вы открыли каталог и цены`,
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,priceListKeyboard)});
+                reply_markup: addBackButton(previousMenu, priceListKeyboard)
+            });
 
         previousMenu = "Каталог и цены 🎁";
 
     } else if (msg.data.toString() === "Стоимость по фото 🖼️") {
         bot.editMessageText(
-            `Пожалуйста загрузите понравившиеся фотографии из интернета. Нажмите отправить и с вами с свяжется специалит после подсчета стоимости композиции.
-            Примерное время ответа ответа 30 минут.`,
+            `${chatOpponent}` + ', пожалуйста прикрепите к сообщению понравившиеся фотографии или композиции, и нажмите отправить. \n\nС вами свяжется специалит для дальнейшей консультаци по стоимости. \n\nПримерное время ответа ответа 30 минут.',
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,getPriceFromPhotoKeyboard)})
-            .then(()=>{
+                reply_markup: addBackButton(previousMenu, getPriceFromPhotoKeyboard)
+            })
+            .then(() => {
                 bot.on('photo', (msg) => {
                     const photoObjectList = msg.photo;
-                    console.log(msg);
+                    console.log('list',msg.photo)
+                    if (photoObjectList) {
+                        // let lowQualityPhotoFileId = photoObjectList[0].file_id;
+                        // let middleQualityPhotoFileId = photoObjectList[1].file_id;
+                        photoList.length >= 2 ? photoList.push(photoObjectList[1].file_id) : photoList.push(photoObjectList[0].file_id);
+                    }
 
-                    if(photoObjectList){
-                        const fromName= msg.from.first_name;
-                        const fromLastName= msg.from.last_name;
-                        const fromUsername= msg.from.username;
-
-                        if(photoList.size === 0 ) {
-                            bot.sendMessage(
-                                adminChatID,
-                                `
-                <b>Босс у нас новый клиент!</b>
-            Просит сосчитать стоимость по фото.
-    
-            <b>ФИО:</b> ${fromName} ${fromLastName}
-            <b>Ник телеграмм:</b> ${fromUsername}
-            <b>Фото:</b>
-            `,
-                                {parse_mode:'HTML'},
-                            );
-                        }
-
-                        for (let i = 0; i < photoObjectList.length ; i++) {
-                            let fileId = photoObjectList[i].file_id;
-                            photoList.add(fileId);
-                        }
+                    if (photoList.length === 1) {
+                        bot.sendMessage(
+                            msg.chat.id,
+                            "Как с вами связаться?",
+                            sendVCard)
                     }
                 });
                 setTimeout(
-                    ()=> {
-                        let myArr = Array.from(photoList);
-                        console.log(myArr);
-                        for (let i = 0; i < myArr.length ; i++) {
-                            let fileId = myArr[i];
-                            bot.sendPhoto(adminChatID,fileId);
+                    () => {
+                        for (let i = 0; i < photoList.length; i++) {
+                            let fileId = photoList[i];
+                            bot.sendPhoto(adminChatID, fileId);
                         }
-                        photoList.clear();
+                        photoList = [];
                     },
                     60000
                 );
@@ -156,25 +174,28 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,faqKeyboard)});
+                reply_markup: addBackButton(previousMenu, faqKeyboard)
+            });
         previousMenu = "Вопросы и ответы ❓";
 
     } else if (msg.data.toString() === "Корзина 📦") {
         let items = false;
-        if(items){
+        if (items) {
             bot.editMessageText(
                 'Список товаров в корзине:',
                 {
                     chat_id: chatId,
                     message_id: messageId,
-                    reply_markup: addBackButton(previousMenu,cartKeyboard)});
+                    reply_markup: addBackButton(previousMenu, cartKeyboard)
+                });
         } else {
             bot.editMessageText(
                 'Ваша козина пока пуста',
                 {
                     chat_id: chatId,
                     message_id: messageId,
-                    reply_markup: addBackButton(previousMenu,cartKeyboard)});
+                    reply_markup: addBackButton(previousMenu, cartKeyboard)
+                });
         }
 
         previousMenu = "Корзина 📦";
@@ -185,7 +206,8 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu,profileKeyboard)});
+                reply_markup: addBackButton(previousMenu, profileKeyboard)
+            });
 
         previousMenu = "Личный кабинет 💼";
     }
