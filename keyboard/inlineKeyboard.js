@@ -50,16 +50,103 @@ function priceListKeyboard() {
     return {
         inline_keyboard: [
             [
-                {text: "Латексные шары",callback_data: "Латексные шары"},
-                {text: "Фольгированные шары",callback_data: "Фольгированные шары"},
-                {text: "Баблс", callback_data: "Баблс"}
+                {text: "Воздушные шары",callback_data: "Воздушные шары"},
+                {text: "Фольги-нные шары, фигуры",callback_data: "Фольги-нные шары, фигуры"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
             [{text: profile, callback_data: profile}]
         ]
     }
 }
-//"Каталог и цены"
+
+//"Воздушные шары"
+function classicBallonsKeyboard() {
+    return {
+        inline_keyboard: [
+            [
+                {text: "Круглые шары",callback_data: "Круглые шары"},
+                {text: "Шары для моделирования",callback_data: "Шары для моделирования"}
+            ],
+            [
+                {text: "Сердца",callback_data: "Сердца"},
+                {text: "Большие шары",callback_data: "Большие шары"}
+            ],
+            [
+                {text: "Сферы Баблс",callback_data: "Сферы Баблс"},
+                {text: "Шары с рисунком",callback_data: "Шары с рисунком"}
+            ],
+            [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
+            [{text: profile, callback_data: profile}]
+        ]
+    }
+}
+
+//"Круглые шары"
+function classicCircleBallonsKeyboard() {
+    return {
+        inline_keyboard: [
+            [
+                {text: "11",callback_data: "10"},
+                {text: "12",callback_data: "12"},
+                {text: "14",callback_data: "14"},
+                {text: "16",callback_data: "16"},
+                {text: "18",callback_data: "18"},
+                {text: "11",callback_data: "10"},
+                {text: "12",callback_data: "12"},
+                {text: "14",callback_data: "14"},
+                {text: "16",callback_data: "16"},
+                {text: "18",callback_data: "18"},
+            ],
+            [
+                {text: "#1",callback_data: "#1"},
+                {text: "#2",callback_data: "#2"},
+                {text: "#3",callback_data: "#3"},
+                {text: "#4",callback_data: "#4"},
+                {text: "#5",callback_data: "#5"},
+                {text: "#6",callback_data: "#6"},
+            ],
+            [
+                {text: "#7",callback_data: "#7"},
+                {text: "#8",callback_data: "#8"},
+                {text: "#9",callback_data: "#9"},
+                {text: "#10",callback_data: "#10"},
+                {text: "#11",callback_data: "#11"},
+                {text: "#12",callback_data: "#12"},
+            ],
+            [
+                {text: "Добавить в корзину",callback_data: "Добавить в корзину"},
+
+            ],
+            [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
+            [{text: profile, callback_data: profile}]
+        ]
+    }
+}
+
+//"Фольгированые шары, фигуры"
+function foilBallonsKeyboard() {
+    return {
+        inline_keyboard: [
+            [
+                {text: "Фигуры",callback_data: "Фигуры"},
+                {text: "Цифры",callback_data: "Цифры"}
+            ],
+            [
+                {text: "Фольга с рисунка",callback_data: "Фольга с рисунка"},
+                {text: "Фольга без рисунка",callback_data: "Фольга без рисунка"}
+            ],
+            [
+                {text: "Буквы",callback_data: "Буквы"},
+                {text: "Ходилки",callback_data: "Ходилки"}
+            ],
+            [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
+            [{text: profile, callback_data: profile}]
+        ]
+    }
+}
+
+
+//"Стоимость по фото"
 function getPriceFromPhotoKeyboard() {
     return {
         inline_keyboard: [
@@ -116,6 +203,9 @@ module.exports.keyboardDefault = keyboardDefault;
 module.exports.sendVCard = sendVCard;
 module.exports.keyboardBalloons = balloonsKeyboard;
 module.exports.priceListKeyboard = priceListKeyboard;
+module.exports.classicBallonsKeyboard = classicBallonsKeyboard;
+module.exports.classicCircleBallonsKeyboard = classicCircleBallonsKeyboard;
+module.exports.foilBallonsKeyboard = foilBallonsKeyboard;
 module.exports.getPriceFromPhotoKeyboard = getPriceFromPhotoKeyboard;
 module.exports.faqKeyboard = faqKeyboard;
 module.exports.cartKeyboard = cartKeyboard;
