@@ -236,17 +236,22 @@ bot.on("callback_query", (msg) => {
         previousMenu = "Фольги-нные шары, фигуры";
 
     } else if (msg.data.toString() === "Круглые шары") {
-        const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and `form-factor` IN ('классический') and `size-inches` IN ('10','12','14','16','18') ORDER BY id_balloon";
-        let table = dataBsaeQuery(classicLatexNormalFilter);
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических воздушных шаров ${table}`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-        previousMenu = "Круглые шары";
+        const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
+
+        dataBaseQuery(classicLatexNormalFilter, function(result) {
+            console.table(result);
+            let table = makeString(result);
+
+            bot.editMessageText(
+                '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров ${table}`,
+                {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                    parse_mode: "HTML"
+                });
+            previousMenu = "Круглые шары";
+        });
     }
 });
 
@@ -258,15 +263,61 @@ bot.on("polling_error", (err) => console.log(err));
 // const airBalloons = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фольгированные') ORDER BY id_balloon";
 // const sql2 = `SELECT NOW()`;//date
 
-function dataBsaeQuery(selector){
+function dataBaseQuery(selector, dataBQ){
     pool.query(selector, (err, res) => {
-        if(err) {
-            throw err;
+        dataBQ(res.rows);
+        if (err) {
+            console.log(err);
         }
-        // console.log({ res });
-        // console.table(res.fields);
-        // console.table(res.rows);
-        // pool.end();
-        return res;
+        else {
+            console.log("connected to database");
+        }
     });
+
+}
+
+function makeString(data) {
+
+    // {
+    //     id_balloon: 15,
+    //     material: 'Р»Р°С‚РµРєСЃ',
+    //     form_factor: 'РєР»Р°СЃСЃРёС‡РµСЃРєРёР№',
+    //     glue: true,
+    //     texture_color: 'С…СЂРѕРј',
+    //     color: null,
+    //     size_inches: 12,
+    //     size_sm: 30,
+    //     inner_atribut: null,
+    //     number_foil: null,
+    //     printed_text: 'false',
+    //     made_in: null,
+    //     price: 110
+    // }
+
+
+    let  description = "Арт: - артикуль товара. \n " +
+        "Обр: - обработка шара специальным клеем для продолжительного полета." +
+        "Тек: - текстура окраски шара и глубина цвета." +
+        "Дюйм - еденица измерения" +
+        "См"
+    let newString = '\n\n| Арт: | Обработка | Текстура | Дюйм | СМ | Напол. | Цена |\n';
+    for (let i = 0; i < data.length; i++) {
+        let idBalloon = data[i].id_balloon >= 10 ? data[i].id_balloon : `${data[i].id_balloon}  `;
+        let material = data[i].material;
+        let formFactor = data[i].form_factor;
+        let glue = data[i].glue ? 'Да  ' : 'Нет';
+        let textureColor = data[i].texture_color.length > 7 ? data[i].texture_color.slice(0,7) : data[i].texture_color;
+        let color = data[i].color;
+        let sizeInches = data[i].size_inches;
+        let sizeSm = data[i].size_sm;
+        let innerAtribut = data[i].inner_atribut ? "Да  " : "Нет";
+        let numberFoil = data[i].number_foil;
+        let printedText = data[i].printed_text;
+        let madeIn = data[i].made_in;
+        let price = data[i].price >= 100 ? data[i].price : `${data[i].price}  `;
+
+        newString += `| ${idBalloon} | ${glue} | ${textureColor} | ${sizeInches} д. | ${sizeSm} см. | ${innerAtribut} | ${price} руб. |\n`;
+    }
+    console.log(newString);
+    return newString;
 }
