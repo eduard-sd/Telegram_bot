@@ -38,7 +38,7 @@ function addBackButton(previousMenu, customKeyboard) {
 bot.on('text', (msg) => {
     const chatValue = msg.chat;
     const chatId = msg.chat.id;
-    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент" ;
+    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент";
 
     console.log(chatOpponent);
 
@@ -54,7 +54,7 @@ bot.on('text', (msg) => {
         // bot.sendPhoto(chatId, "https://avatars.mds.yandex.net/get-pdb/1681173/b1c1cbe3-c6ef-4662-af9e-fe3db83d1ec8/s1200");
         bot.sendMessage(
             chatId,
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571498410/TelegramBotSharoladya/sharolandiay_noxiev.png">Шароландия</a>'+`\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571498410/TelegramBotSharoladya/sharolandiay_noxiev.png">Шароландия</a>' + `\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
             {
                 reply_markup: addBackButton(previousMenu, keyboardBalloons),
                 parse_mode: "HTML"
@@ -70,6 +70,53 @@ bot.on('text', (msg) => {
             `${chatOpponent}, вы нажали "отмена"`,
             {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
         );
+    } else if (msg.text.toString().length >= 4 && msg.text.toString().length <= 8) {
+        let message = msg.text.toString();
+        checkDashInString();
+
+        function checkDashInString() {
+            let dash = 0;
+            for (let i = 0; i < message.length; i++) {
+                if (message[i] === "-") {
+                    dash++
+                }
+            }
+
+            if (dash === 2) {
+                let messageArray = message.split("-");
+                checkNumberNotZero(messageArray);
+            } else {
+                console.log('Wrong type of message')
+            }
+        }
+
+        function checkNumberNotZero(messageArray) {
+            console.log(messageArray);
+            for (let i = 0; i < messageArray.length; i++) {
+                if (i === 0) {
+                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+                        console.log('Wrong article, cant be empty or with letters');
+                    } else if (parseInt(messageArray[i]) === 0) {
+                        console.log(isNaN(messageArray[i]), 'Article cant be zero');
+                    }
+                } else if (i === 1) {
+                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+                        console.log('Wrong color, cant be empty or with letters');
+                    } else if (parseInt(messageArray[i]) === 0) {
+                        console.log(isNaN(messageArray[i]), 'Color cant be zero');
+                    }
+                } else if (i === 2) {
+                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+                        console.log('Wrong count, cant be empty or with letters');
+                    } else if (parseInt(messageArray[i]) === 0) {
+                        console.log(isNaN(messageArray[i]), 'Count cant be zero');
+                    }
+                }
+            }
+        }
+
+    } else {
+        console.log('Wrong type of message')
     }
 });
 
@@ -96,13 +143,12 @@ bot.on('contact', (msg) => {
 });
 
 
-
 bot.on("callback_query", (msg) => {
 
     // console.log(msg);
     const chatValue = msg.message.chat;
     const chatId = chatValue.id;
-    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент" ;
+    const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент";
     const messageId = msg.message.message_id;
 
 
@@ -113,7 +159,7 @@ bot.on("callback_query", (msg) => {
 
     if (msg.data.toString() === "Шары 🎈") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571498410/TelegramBotSharoladya/sharolandiay_noxiev.png">Шароландия</a>'+`\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571498410/TelegramBotSharoladya/sharolandiay_noxiev.png">Шароландия</a>' + `\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -124,7 +170,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (msg.data.toString() === "Каталог и цены 🎁") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502686/TelegramBotSharoladya/catalog_ktpfa6.png">Каталог и цены 🎁</a>'+`${chatOpponent}, вы открыли каталог и цены`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502686/TelegramBotSharoladya/catalog_ktpfa6.png">Каталог и цены 🎁</a>' + `${chatOpponent}, вы открыли каталог и цены`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -144,7 +190,7 @@ bot.on("callback_query", (msg) => {
             .then(() => {
                 bot.on('photo', (msg) => {
                     const photoObjectList = msg.photo;
-                    console.log('list',msg.photo)
+                    console.log('list', msg.photo)
                     if (photoObjectList) {
                         // let lowQualityPhotoFileId = photoObjectList[0].file_id;
                         // let middleQualityPhotoFileId = photoObjectList[1].file_id;
@@ -214,7 +260,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (msg.data.toString() === "Воздушные шары") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Воздушные шары</a>'+`\n${chatOpponent}, вы открыли каталог классических воздушных шаров`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Воздушные шары</a>' + `\n${chatOpponent}, вы открыли каталог классических воздушных шаров`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -225,7 +271,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (msg.data.toString() === "Фольги-нные шары, фигуры") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фольгированные шары, фигуры</a>'+`\n${chatOpponent}, вы открыли каталог фольгированных шаров`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фольгированные шары, фигуры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных шаров`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -238,12 +284,12 @@ bot.on("callback_query", (msg) => {
     } else if (msg.data.toString() === "Круглые шары") {
         const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
 
-        dataBaseQuery(classicLatexNormalFilter, function(result) {
+        dataBaseQuery(classicLatexNormalFilter, function (result) {
             console.table(result);
             let table = makeString(result);
 
             bot.editMessageText(
-                '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров ${table}`,
+                '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.\n\n${table}`,
                 {
                     chat_id: chatId,
                     message_id: messageId,
@@ -263,28 +309,31 @@ bot.on("polling_error", (err) => console.log(err));
 // const airBalloons = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фольгированные') ORDER BY id_balloon";
 // const sql2 = `SELECT NOW()`;//date
 
-function dataBaseQuery(selector, dataBQ){
+
+//подключение к дб
+function dataBaseQuery(selector, dataBQ) {
     pool.query(selector, (err, res) => {
         dataBQ(res.rows);
         if (err) {
             console.log(err);
-        }
-        else {
+        } else {
             console.log("connected to database");
         }
     });
 
 }
 
+
+//создание текста
 function makeString(data) {
 
     // {
     //     id_balloon: 15,
-    //     material: 'Р»Р°С‚РµРєСЃ',
-    //     form_factor: 'РєР»Р°СЃСЃРёС‡РµСЃРєРёР№',
+    //     material: 'каучук',
+    //     form_factor: 'класические',
     //     glue: true,
-    //     texture_color: 'С…СЂРѕРј',
-    //     color: null,
+    //     texture_color: '4 вида ',
+    //     color: '72 вида',
     //     size_inches: 12,
     //     size_sm: 30,
     //     inner_atribut: null,
@@ -293,31 +342,41 @@ function makeString(data) {
     //     made_in: null,
     //     price: 110
     // }
+    let instruction = "<strong>Инструкция добавления в корзину:\n</strong>" +
+        "1) Выберите актикуль шара, номер цвета, определитесь с количеством\n" +
+        "2) Отправьте сообщение (цифрами, через тире, без пробела):\n " +
+        "артикуль-цвет-количество\n" +
+        "Пример сообщения:\nхх-хх-хх\n";
 
+    let terms = "<strong>Сокращения:</strong>\n" +
+        "<strong>\"Ар\"</strong> - артикуль товара.\n " +
+        "<strong>\"Об\"</strong> - обработка шара.\n" +
+        "<strong>\"Тек\"</strong> - текстура цвета (пастель, прозрачные, металик, с дизайном, хром, агат).\n" +
+        "<strong>\"Д.\"</strong> - дюймов в диаметре.\n" +
+        "<strong>\"См\"</strong> - сантиметров в диаметре.\n" +
+        "<strong>\"Нап\"</strong> - наполнитель конфетти или краски.\n" +
+        "<strong>\"Цен\"</strong> - стомость в рублях.\n\n ";
 
-    let  description = "Арт: - артикуль товара. \n " +
-        "Обр: - обработка шара специальным клеем для продолжительного полета." +
-        "Тек: - текстура окраски шара и глубина цвета." +
-        "Дюйм - еденица измерения" +
-        "См"
-    let newString = '\n\n| Арт: | Обработка | Текстура | Дюйм | СМ | Напол. | Цена |\n';
+    let catalog = "<strong>Прайс-лист:</strong>\n" +
+        "\n| Ар | Об | Тек | Д. | См | Нап | Цен |\n";
+
     for (let i = 0; i < data.length; i++) {
         let idBalloon = data[i].id_balloon >= 10 ? data[i].id_balloon : `${data[i].id_balloon}  `;
         let material = data[i].material;
         let formFactor = data[i].form_factor;
-        let glue = data[i].glue ? 'Да  ' : 'Нет';
-        let textureColor = data[i].texture_color.length > 7 ? data[i].texture_color.slice(0,7) : data[i].texture_color;
+        let glue = data[i].glue ? 'да ' : 'нет';
+        let textureColor = data[i].texture_color.length > 3 ? data[i].texture_color.slice(0, 3) : data[i].texture_color;
         let color = data[i].color;
         let sizeInches = data[i].size_inches;
         let sizeSm = data[i].size_sm;
-        let innerAtribut = data[i].inner_atribut ? "Да  " : "Нет";
+        let innerAtribut = data[i].inner_atribut ? "да  " : "нет";
         let numberFoil = data[i].number_foil;
         let printedText = data[i].printed_text;
         let madeIn = data[i].made_in;
-        let price = data[i].price >= 100 ? data[i].price : `${data[i].price}  `;
+        let price = data[i].price >= 100 ? data[i].price : ` ${data[i].price} `;
 
-        newString += `| ${idBalloon} | ${glue} | ${textureColor} | ${sizeInches} д. | ${sizeSm} см. | ${innerAtribut} | ${price} руб. |\n`;
+        catalog += `|  ${idBalloon} | ${glue} | ${textureColor}  | ${sizeInches} | ${sizeSm} |  ${innerAtribut} | ${price} |\n`;
     }
-    console.log(newString);
-    return newString;
+    let textMessage = catalog + "\n" + terms + instruction;
+    return textMessage;
 }
