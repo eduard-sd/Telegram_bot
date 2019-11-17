@@ -120,6 +120,8 @@ bot.on('text', (msg) => {
     }
 });
 
+
+//для расчета по фото
 bot.on('contact', (msg) => {
     console.log(msg);
     const chatId = msg.chat.id;
@@ -141,6 +143,109 @@ bot.on('contact', (msg) => {
         {parse_mode: 'HTML'},
     );
 });
+
+//полный прайс лист
+// let priceList = [];
+//
+// dataBaseQuery("SELECT * FROM telegramdb.balloonprice ORDER BY id_balloon", function (result) {
+//     // console.log(result);
+//     priceList = result.slice();
+//     arrayFromPriceListKeys(priceList);
+// });
+
+
+
+
+function arrayFromPriceListKeys (priceList) { //получить все значение возможные в прайс листе по каждлому шару для кнопок
+    let element = {
+        material: [],
+        form_factor: [],
+        glue: [],
+        texture_color: [],
+        // color: [], //return  color: [ null ]
+        size_inches: [],
+        size_sm: [],
+        inner_atribut: [],
+        // number_foil: [], //return  number_foil: [ null ]
+        printed_text: [],
+        made_in: [],
+    };
+    let elementKeysList = Object.keys(element); //массив ключей []
+
+    for (let j = 0; j < priceList.length; j++) {
+        for (let i = 0; i < elementKeysList.length; i++) {
+            element[elementKeysList[i]].push(priceList[j][elementKeysList[i]])
+        }
+    }
+
+    for (let i = 0; i < elementKeysList.length; i++) {
+        let unique  = new Set(element[elementKeysList[i]]);
+        element[elementKeysList[i]] = Array.from(unique).sort();
+    }
+    console.log(element);
+
+    return element;
+
+};
+
+//прайс листы по категориям
+let priceList_foil = [];
+let priceList_classic = [];
+let priceList_heart = [];
+let priceList_bigSize = [];
+let priceList_babbles = [];
+let priceList_withPaint = [];
+// let priceList_model = [];
+
+const foilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фольгированные') ORDER BY id_balloon";
+const classicFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
+const heartFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('сердце') ORDER BY id_balloon";
+const bigSizeFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('24','26','27','30','36','40') ORDER BY id_balloon";
+const babblesFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('баблс') and form_factor IN ('шар') ORDER BY id_balloon";
+const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and texture_color IN ('дизайн') ORDER BY id_balloon";
+// const modelFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('моделирование') ORDER BY id_balloon";
+
+dataBaseQuery(foilFilter, function (result) {
+    console.log(1);
+    priceList_foil = result.slice();
+    arrayFromPriceListKeys(priceList_foil);
+});
+
+dataBaseQuery(classicFilter, function (result) {
+    console.log(2);
+    priceList_classic = result.slice();
+    arrayFromPriceListKeys(priceList_classic);
+});
+
+dataBaseQuery(heartFilter, function (result) {
+    console.log(3);
+    priceList_heart = result.slice();
+    arrayFromPriceListKeys(priceList_heart);
+});
+
+dataBaseQuery(bigSizeFilter, function (result) {
+    console.log(4);
+    priceList_bigSize = result.slice();
+    arrayFromPriceListKeys(priceList_bigSize);
+});
+
+dataBaseQuery(babblesFilter, function (result) {
+    console.log(5);
+    priceList_babbles = result.slice();
+    arrayFromPriceListKeys(priceList_babbles);
+});
+
+dataBaseQuery(withPaintFilter, function (result) {
+    console.log(6);
+    priceList_withPaint = result.slice();
+    arrayFromPriceListKeys(priceList_withPaint);
+});
+
+// dataBaseQuery(modelFilter, function (result) {
+//     priceList_model = result.slice();
+//     arrayFromPriceListKeys(priceList_model);
+// });
+
 
 
 bot.on("callback_query", (msg) => {
@@ -281,13 +386,12 @@ bot.on("callback_query", (msg) => {
 
         previousMenu = "Фольги-нные шары, фигуры";
 
-    } else if (msg.data.toString() === "Круглые шары") {
+    } else if (msg.data.toString() === "Круглые шары") {//под замену колбек
+        console.log(priceList);
         const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
 
         dataBaseQuery(classicLatexNormalFilter, function (result) {
-            console.table(result);
             let table = makeString(result);
-
             bot.editMessageText(
                 '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.\n\n${table}`,
                 {
@@ -299,6 +403,7 @@ bot.on("callback_query", (msg) => {
             previousMenu = "Круглые шары";
         });
     }
+
 });
 
 bot.on("polling_error", (err) => console.log(err));
