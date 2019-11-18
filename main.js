@@ -156,10 +156,8 @@ bot.on('contact', (msg) => {
 
 
 
-function arrayFromPriceListKeys (priceList) { //получить все значение возможные в прайс листе по каждлому шару для кнопок
+function arrayFromPriceListKeys (priceList) { //получить все значение возможные в прайс листе по каждлому шару для кнопок и уточнений от клиента
     let element = {
-        material: [],
-        form_factor: [],
         glue: [],
         texture_color: [],
         // color: [], //return  color: [ null ]
@@ -181,69 +179,97 @@ function arrayFromPriceListKeys (priceList) { //получить все знач
     for (let i = 0; i < elementKeysList.length; i++) {
         let unique  = new Set(element[elementKeysList[i]]);
         element[elementKeysList[i]] = Array.from(unique).sort();
+        if (element[elementKeysList[i]].length < 2 && element[elementKeysList[i]][0] === null) {
+            delete element[elementKeysList[i]];
+        }
     }
     console.log(element);
 
     return element;
-
-};
+}
 
 //прайс листы по категориям
-let priceList_foil = [];
-let priceList_classic = [];
-let priceList_heart = [];
-let priceList_bigSize = [];
-let priceList_babbles = [];
-let priceList_withPaint = [];
-// let priceList_model = [];
+let heartFoil = [];
+let starFoil = [];
+let figureFoil = [];
+let circleFoil = [];
+let numberFoil = [];
+let classic = [];
+let heart = [];
+let bigSize = [];
+let babbles = [];
+let withPaint = [];
+// let modelBalloon = [];
 
-const foilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фольгированные') ORDER BY id_balloon";
+const foilHeartFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('сердце') ORDER BY id_balloon";
+const foilStarFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('звезда') ORDER BY id_balloon";
+const foilFigureFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фигуры') ORDER BY id_balloon";
+const foilCircleFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('круг') ORDER BY id_balloon";
+const foilNumberFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('цифра') ORDER BY id_balloon";
 const classicFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
 const heartFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('сердце') ORDER BY id_balloon";
 const bigSizeFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('24','26','27','30','36','40') ORDER BY id_balloon";
 const babblesFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('баблс') and form_factor IN ('шар') ORDER BY id_balloon";
 const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and texture_color IN ('дизайн') ORDER BY id_balloon";
-// const modelFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('моделирование') ORDER BY id_balloon";
+// const modelBalloonFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('моделирование') ORDER BY id_balloon";
 
-dataBaseQuery(foilFilter, function (result) {
-    console.log(1);
-    priceList_foil = result.slice();
-    arrayFromPriceListKeys(priceList_foil);
+
+//фольга
+dataBaseQuery(foilHeartFilter, function (result) {
+    heartFoil = result.slice();
+    arrayFromPriceListKeys(heartFoil);
 });
 
+dataBaseQuery(foilStarFilter, function (result) {
+    starFoil = result.slice();
+    arrayFromPriceListKeys(starFoil);
+});
+
+dataBaseQuery(foilFigureFilter, function (result) {
+    figureFoil = result.slice();
+    arrayFromPriceListKeys(figureFoil);
+});
+
+dataBaseQuery(foilCircleFilter, function (result) {
+    circleFoil = result.slice();
+    arrayFromPriceListKeys(circleFoil);
+});
+
+dataBaseQuery(foilNumberFilter, function (result) {
+    numberFoil = result.slice();
+    arrayFromPriceListKeys(numberFoil);
+});
+
+
+//латекс
 dataBaseQuery(classicFilter, function (result) {
-    console.log(2);
-    priceList_classic = result.slice();
-    arrayFromPriceListKeys(priceList_classic);
+    classic = result.slice();
+    arrayFromPriceListKeys(classic);
 });
 
 dataBaseQuery(heartFilter, function (result) {
-    console.log(3);
-    priceList_heart = result.slice();
-    arrayFromPriceListKeys(priceList_heart);
+    heart = result.slice();
+    arrayFromPriceListKeys(heart);
 });
 
 dataBaseQuery(bigSizeFilter, function (result) {
-    console.log(4);
-    priceList_bigSize = result.slice();
-    arrayFromPriceListKeys(priceList_bigSize);
+    bigSize = result.slice();
+    arrayFromPriceListKeys(bigSize);
 });
 
 dataBaseQuery(babblesFilter, function (result) {
-    console.log(5);
-    priceList_babbles = result.slice();
-    arrayFromPriceListKeys(priceList_babbles);
+    babbles = result.slice();
+    arrayFromPriceListKeys(babbles);
 });
 
 dataBaseQuery(withPaintFilter, function (result) {
-    console.log(6);
-    priceList_withPaint = result.slice();
-    arrayFromPriceListKeys(priceList_withPaint);
+    withPaint = result.slice();
+    arrayFromPriceListKeys(withPaint);
 });
 
-// dataBaseQuery(modelFilter, function (result) {
-//     priceList_model = result.slice();
-//     arrayFromPriceListKeys(priceList_model);
+// dataBaseQuery(modelBalloonFilter, function (result) {
+//     modelBalloon = result.slice();
+//     arrayFromPriceListKeys(modelBalloon);
 // });
 
 
@@ -332,6 +358,46 @@ bot.on("callback_query", (msg) => {
             });
         previousMenu = "Вопросы и ответы ❓";
 
+    } else if (msg.data.toString() === "Как заказать ❓") {
+        bot.editMessageText(
+            'Как заказать ❓',
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, faqKeyboard)
+            });
+        previousMenu = "Как заказать ❓";
+
+    } else if (msg.data.toString() === "Доставка 🚚") {
+        bot.editMessageText(
+            'Доставка 🚚',
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, faqKeyboard)
+            });
+        previousMenu = "Доставка 🚚";
+
+    } else if (msg.data.toString() === "Адреса") {
+        bot.editMessageText(
+            'Адреса',
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, faqKeyboard)
+            });
+        previousMenu = "Адреса";
+
+    } else if (msg.data.toString() === "Гарантии 👍") {
+        bot.editMessageText(
+            'Гарантии 👍',
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, faqKeyboard)
+            });
+        previousMenu = "Гарантии 👍";
+
     } else if (msg.data.toString() === "Корзина 📦") {
         let items = false;
         if (items) {
@@ -386,34 +452,150 @@ bot.on("callback_query", (msg) => {
 
         previousMenu = "Фольги-нные шары, фигуры";
 
-    } else if (msg.data.toString() === "Круглые шары") {//под замену колбек
-        console.log(priceList);
-        const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
+    } else if (msg.data.toString() === "Фигуры") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фигуры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных фигуры`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
 
-        dataBaseQuery(classicLatexNormalFilter, function (result) {
-            let table = makeString(result);
-            bot.editMessageText(
-                '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.\n\n${table}`,
-                {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                    parse_mode: "HTML"
-                });
-            previousMenu = "Круглые шары";
-        });
+        previousMenu = "Фигуры";
+
+    } else if (msg.data.toString() === "Цифры") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Цифры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных цифр`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+
+        previousMenu = "Цифры";
+
+    } else if (msg.data.toString() === "Фольга с рисунком") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фольга с рисунком</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных шары с рисунком`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+
+        previousMenu = "Фольга с рисунком";
+
+    } else if (msg.data.toString() === "Фольга без рисунком") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фольга без рисунком</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных шаров без рисунка`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+
+        previousMenu = "Фольга без рисунком";
+
+    } else if (msg.data.toString() === "Буквы") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Буквы</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных букв`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+
+        previousMenu = "Буквы";
+
+    } else if (msg.data.toString() === "Ходилки") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фигуры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных ходилок`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+
+        previousMenu = "Ходилки";
+
+    } else if (msg.data.toString() === "Круглые шары") {
+
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Круглые шары";
+
+    } else if (msg.data.toString() === "Шары для моделирования") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Шары для моделирования</a>' + `\n${chatOpponent}, вы открыли каталог шаров для моделирования.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Шары для моделирования";
+
+    } else if (msg.data.toString() === "Сердца") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Сердца</a>' + `\n${chatOpponent}, вы открыли каталог шаров сердца.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Сердца";
+
+    } else if (msg.data.toString() === "Большие шары") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Большие шары</a>' + `\n${chatOpponent}, вы открыли каталог больших шаров.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Большие шары";
+
+    } else if (msg.data.toString() === "Баблс") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Баблс</a>' + `\n${chatOpponent}, вы открыли каталог баблс.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Баблс";
+
+    } else if (msg.data.toString() === "Шары с рисунком") {
+        bot.editMessageText(
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Шары с рисунком</a>' + `\n${chatOpponent}, вы открыли каталог шаров с рисунком.`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+                parse_mode: "HTML"
+            });
+        previousMenu = "Шары с рисунком";
+
     }
 
 });
 
 bot.on("polling_error", (err) => console.log(err));
-
-
-// const sql = `SELECT * FROM telegramdb.balloonprice`;
-// const foilBalloons = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс','баблс') ORDER BY id_balloon";
-// const airBalloons = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фольгированные') ORDER BY id_balloon";
-// const sql2 = `SELECT NOW()`;//date
-
 
 //подключение к дб
 function dataBaseQuery(selector, dataBQ) {
@@ -427,6 +609,33 @@ function dataBaseQuery(selector, dataBQ) {
     });
 
 }
+
+
+
+
+
+
+
+
+
+// else if (msg.data.toString() === "Круглые шары") {//под замену колбек
+//     console.log(priceList);
+//     const classicLatexNormalFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
+//
+//     dataBaseQuery(classicLatexNormalFilter, function (result) {
+//         let table = makeString(result);
+//         bot.editMessageText(
+//             '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.\n\n${table}`,
+//             {
+//                 chat_id: chatId,
+//                 message_id: messageId,
+//                 reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
+//                 parse_mode: "HTML"
+//             });
+//         previousMenu = "Круглые шары";
+//     });
+// }
+
 
 
 //создание текста
