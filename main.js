@@ -36,24 +36,37 @@ function addBackButton(previousMenu, customKeyboard) {
 }
 
 //создание кнопок из ключей обьекта objectKey прайслиста и склеивание с основной клавиатурой customKeyboard
-function addPriceListKeyButtons (objectKey, customKeyboard) {
+function addPriceListKeyButtons (objectValue, objectKey) {
     console.log('addPriceListKeyButtons')
-    let customKeyboardArray = customKeyboard.inline_keyboard;
-    let arrayValues = arrayFromPriceListKeys.objectKey;
     let arrayButtons = [];
     let temp = [];
 
-    for(let k = 0; k < arrayValues.length; k++) {
-        temp.push({text:arrayValues[k],callback_query:arrayValues[k]});
+    for(let k = 0; k < objectValue.length; k++) {
+        let data = '';
+        if (objectValue[k] && typeof objectValue[k] === 'boolean') {
+            data = 'Да';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'boolean') {
+            data = 'Нет';
+        } else {
+            data = objectValue[k]
+        }
+
+        temp.push({text: data,callback_data: objectKey+'.'+data});
         if((k+1) % 5 === 0) {
             arrayButtons.push(temp);
             temp = []
+        } else if(k+1 === objectValue.length ) {
+            arrayButtons.push(temp)
         }
     }
-
-    console.log(arrayButtons);
-    return arrayButtons.concat(customKeyboardArray);
+    return arrayButtons;
 }
+
+//склеивание кнопок в клавиатуру
+function concatButtons (fistkeyboard, secondkeyboard) {
+    return {inline_keyboard: fistkeyboard.concat(secondkeyboard)};
+}
+
 
 bot.on('text', (msg) => {
     const chatValue = msg.chat;
@@ -215,7 +228,7 @@ function arrayFromPriceListKeys (priceList) {
             delete element[elementKeysList[i]];
         }
     }
-    console.log(element);
+    // console.log(element);
 
     return element;
 };
@@ -563,9 +576,9 @@ bot.on("callback_query", (msg) => {
         previousMenu = "Ходилки";
 
     } else if (msg.data.toString() === "Круглые шары") {
-        let classicArray = arrayFromPriceListKeys(classic);
 
-        interview(classicArray);
+
+        interview(classic);
         // bot.editMessageText(
         //     '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.`,
         //     {
@@ -650,39 +663,51 @@ bot.on("callback_query", (msg) => {
     } else if (msg.data.toString() === "опрос") {
         //запуск функции
         interview()
-
     }
 
+    //опрос покупателя по часто повторяющимся справшиваемым вопросам по шарам
+    // с динамической генерацией клавиатуры и вопросов в зависимости от категории
+    function interview(data) {
+        console.log('interview');
+        let arrayValuesForEachKey = arrayFromPriceListKeys(data);
+        // const keysArray = Object.keys(arrayFromPriceListKeys).sort();
 
+        if (arrayValuesForEachKey.hasOwnProperty('glue')) {
+            if (arrayValuesForEachKey.glue.length > 0 && newAddingBalloon.glue.length < 1) {
+                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+                let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.glue, "glue");
+
+                bot.editMessageText(
+                    '<a href="">Обработка </a>' + `Для чего нужна обработка шара: Вам шар обработкой ?`,
+                    {
+                        chat_id: chatId,
+                        message_id: messageId,
+                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        parse_mode: "HTML"
+                    });
+            }
+            // Do things here
+        }
+        else if (arrayValuesForEachKey.hasOwnProperty('texture_color')) {
+            if (arrayValuesForEachKey.texture_color.length > 0 && newAddingBalloon.texture_color.length < 1) {
+                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+                let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.glue, "texture_color");
+
+                bot.editMessageText(
+                    '<a href="">Обработка</a>' + `У воздушных шаров бывает ращличная текстура цвета. Шары с сложным цветом чуть дороше простых. Какая текстура вам нужна?`,
+                    {
+                        chat_id: chatId,
+                        message_id: messageId,
+                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        parse_mode: "HTML"
+                    });
+            }
+            // Do things here
+        }
+    }
 });
 
-//опрос покупателя по часто справшиваемым вопросам по шарам
-// с динамической генерацией клавиатуры и вопросов в зависимости от категории
-function interview(array) {
-    console.log('interview')
-    console.log(array)
 
-    // const priceKeys = Object.values(arrayFromPriceListKeys).sort();
-    // console.log(priceKeys)
-
-    if (arrayFromPriceListKeys.hasOwnProperty('glue')) {
-        console.log('1')
-        if (arrayFromPriceListKeys.glue.length > 0 && newAddingBalloon.glue.length < 1) {
-            console.log('2')
-            let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
-
-            bot.editMessageText(
-                '<a href="">Шары с рисунком</a>' + `Вам нужен клей ?`,
-                {
-                    chat_id: chatId,
-                    message_id: messageId,
-                    reply_markup: addPriceListKeyButtons(priceKeys, standartKeyboard),
-                    parse_mode: "HTML"
-                });
-        }
-        // Do things here
-    } else {}
-}
 
 
 bot.on("polling_error", (err) => console.log(err));
