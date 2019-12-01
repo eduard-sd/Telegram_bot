@@ -22,6 +22,106 @@ const adminChatID = '1875888';
 let previousMenu = 'Шары 🎈';
 let arrayValuesForEachKey = [];
 
+//объект нового шара для опроса
+let newAddingBalloon = {
+    glue: '',
+    texture_color: '',
+    // color: [], //return  color: [ null ]
+    size_inches: '',
+    // size_sm: '',
+    inner_atribut: '',
+    // number_foil: [], //return  number_foil: [ null ]
+    printed_text: '',
+    made_in: '',
+};
+
+function cleanNewAddingBalloon () {
+    for (let i in newAddingBalloon){
+        if (newAddingBalloon.hasOwnProperty(i)){
+            delete newAddingBalloon[i];
+        }
+    }
+    console.log(newAddingBalloon)
+}
+
+
+//прайс листы по категориям
+let cleanOrPaintedFoil = [];
+let figureFlyFoil = [];
+let numberFoil = [];
+let letterFoil = [];
+let floorMoveFoil = [];
+
+let classic = [];
+let heart = [];
+let bigSize = [];
+let babbles = [];
+let withPaint = [];
+// let modelBalloon = [];
+
+const cleanOrPaintedFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('сердце','звезда','круг') ORDER BY id_balloon";
+const figureFlyFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фигуры') ORDER BY id_balloon";
+const numberFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('цифра') ORDER BY id_balloon";
+const letterFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('буква') ORDER BY id_balloon";
+const floorMoveFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('напольные') ORDER BY id_balloon";
+
+const classicFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
+const heartFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('сердце') ORDER BY id_balloon";
+const bigSizeFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('24','26','27','30','36','40') ORDER BY id_balloon";
+const babblesFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('баблс') and form_factor IN ('шар') ORDER BY id_balloon";
+const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and texture_color IN ('дизайн') ORDER BY id_balloon";
+// const modelBalloonFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('моделирование') ORDER BY id_balloon";
+
+
+//фольга запрашиваем обьект прайс листа по категориям
+dataBaseQuery(cleanOrPaintedFoilFilter, function (result) {
+    cleanOrPaintedFoil = result.slice();
+});
+
+
+dataBaseQuery(figureFlyFoilFilter, function (result) {
+    figureFlyFoil = result.slice();
+});
+
+
+dataBaseQuery(numberFoilFilter, function (result) {
+    numberFoil = result.slice();
+});
+
+dataBaseQuery(letterFoilFilter, function (result) {
+    letterFoil = result.slice();
+});
+
+dataBaseQuery(floorMoveFoilFilter, function (result) {
+    floorMoveFoil = result.slice();
+});
+
+
+//латекс запрашиваем обьект прайс листа по категориям
+dataBaseQuery(classicFilter, function (result) {
+    classic = result.slice();
+});
+
+dataBaseQuery(heartFilter, function (result) {
+    heart = result.slice();
+});
+
+dataBaseQuery(bigSizeFilter, function (result) {
+    bigSize = result.slice();
+});
+
+dataBaseQuery(babblesFilter, function (result) {
+    babbles = result.slice();
+});
+
+dataBaseQuery(withPaintFilter, function (result) {
+    withPaint = result.slice();
+});
+
+// dataBaseQuery(modelBalloonFilter, function (result) {
+//     modelBalloon = result.slice();
+// });
+
 
 //добавление кнопки назад в клавиатуру
 function addBackButton(previousMenu, customKeyboard) {
@@ -39,21 +139,25 @@ function addBackButton(previousMenu, customKeyboard) {
 //создание кнопок из ключей обьекта objectKey прайслиста и склеивание с основной клавиатурой customKeyboard
 function addPriceListKeyButtons (objectValue, objectKey) {
     console.log('addPriceListKeyButtons');
+
     let arrayButtons = [];
     let temp = [];
 
     for(let k = 0; k < objectValue.length; k++) {
+        console.log(typeof objectValue[k]);
         let data = '';
         if (objectValue[k] && typeof objectValue[k] === 'boolean') {
             data = 'Да';
         } else if (!objectValue[k] && typeof objectValue[k] === 'boolean') {
+            data = 'Нет';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'object') {
             data = 'Нет';
         } else {
             data = objectValue[k]
         }
 
         temp.push({text: data,callback_data: 'опрос.'+objectKey+'.'+data});
-        if((k+1) % 5 === 0) {
+        if((k+1) % 4 === 0) {
             arrayButtons.push(temp);
             temp = []
         } else if(k+1 === objectValue.length ) {
@@ -67,6 +171,63 @@ function addPriceListKeyButtons (objectValue, objectKey) {
 function concatButtons (fistkeyboard, secondkeyboard) {
     return {inline_keyboard: fistkeyboard.concat(secondkeyboard)};
 }
+
+//для расчета стоимости по фото
+bot.on('contact', (msg) => {
+    console.log(msg);
+    const chatId = msg.chat.id;
+    const fromName = msg.from.first_name;
+    const fromLastName = msg.from.last_name;
+    const fromUsername = msg.from.username;
+    const fromContact = msg.contact.phone_number;
+
+    bot.sendMessage(
+        chatId,
+        `${fromName}, приступаем к расчету...`,
+        {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+    );
+
+
+    bot.sendMessage(
+        adminChatID,
+        "<b>Босс у нас новый клиент!</b> \nПросит сосчитать стоимость по фото." + `\n\n<b>ФИО:</b> ${fromName} ${fromLastName} \n<b>Ник телеграмм:</b> ${fromUsername} \n<b>Телефон:</b> ${fromContact}`,
+        {parse_mode: 'HTML'},
+    );
+});
+
+
+//получить все значение возможные в прайс листе по каждлому шару для кнопок и уточнений от клиента
+function arrayFromPriceListKeys (priceList) {
+    let element = {
+        glue: [],
+        texture_color: [],
+        // color: [], //return  color: [ null ]
+        size_inches: [],
+        // size_sm: [],
+        inner_atribut: [],
+        // number_foil: [], //return  number_foil: [ null ]
+        printed_text: [],
+        made_in: [],
+    };
+    let elementKeysList = Object.keys(element); //массив ключей []
+
+    for (let j = 0; j < priceList.length; j++) {
+        for (let i = 0; i < elementKeysList.length; i++) {
+            element[elementKeysList[i]].push(priceList[j][elementKeysList[i]])
+        }
+    }
+
+    for (let i = 0; i < elementKeysList.length; i++) {
+        let unique  = new Set(element[elementKeysList[i]]);
+        element[elementKeysList[i]] = Array.from(unique).sort();
+        if (element[elementKeysList[i]].length < 2 && element[elementKeysList[i]][0] === null) {
+            delete element[elementKeysList[i]];
+        }
+    }
+    console.log(element)
+
+    return element;
+};
 
 
 bot.on('text', (msg) => {
@@ -151,155 +312,6 @@ bot.on('text', (msg) => {
         console.log('Wrong type of message')
     }
 });
-
-
-//для расчета по фото
-bot.on('contact', (msg) => {
-    console.log(msg);
-    const chatId = msg.chat.id;
-    const fromName = msg.from.first_name;
-    const fromLastName = msg.from.last_name;
-    const fromUsername = msg.from.username;
-    const fromContact = msg.contact.phone_number;
-
-    bot.sendMessage(
-        chatId,
-        `${fromName}, приступаем к расчету...`,
-        {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
-    );
-
-
-    bot.sendMessage(
-        adminChatID,
-        "<b>Босс у нас новый клиент!</b> \nПросит сосчитать стоимость по фото." + `\n\n<b>ФИО:</b> ${fromName} ${fromLastName} \n<b>Ник телеграмм:</b> ${fromUsername} \n<b>Телефон:</b> ${fromContact}`,
-        {parse_mode: 'HTML'},
-    );
-});
-
-
-
-let newAddingBalloon = {
-    glue: '',
-    texture_color: '',
-    // color: [], //return  color: [ null ]
-    size_inches: '',
-    size_sm: '',
-    inner_atribut: '',
-    // number_foil: [], //return  number_foil: [ null ]
-    printed_text: '',
-    made_in: '',
-};
-
-
-//получить все значение возможные в прайс листе по каждлому шару для кнопок и уточнений от клиента
-function arrayFromPriceListKeys (priceList) {
-    let element = {
-        glue: [],
-        texture_color: [],
-        // color: [], //return  color: [ null ]
-        size_inches: [],
-        size_sm: [],
-        inner_atribut: [],
-        // number_foil: [], //return  number_foil: [ null ]
-        printed_text: [],
-        made_in: [],
-    };
-    let elementKeysList = Object.keys(element); //массив ключей []
-
-    for (let j = 0; j < priceList.length; j++) {
-        for (let i = 0; i < elementKeysList.length; i++) {
-            element[elementKeysList[i]].push(priceList[j][elementKeysList[i]])
-        }
-    }
-
-    for (let i = 0; i < elementKeysList.length; i++) {
-        let unique  = new Set(element[elementKeysList[i]]);
-        element[elementKeysList[i]] = Array.from(unique).sort();
-        if (element[elementKeysList[i]].length < 2 && element[elementKeysList[i]][0] === null) {
-            delete element[elementKeysList[i]];
-        }
-    }
-
-    return element;
-};
-
-//прайс листы по категориям
-let cleanOrPaintedFoil = [];
-let figureFlyFoil = [];
-let numberFoil = [];
-let letterFoil = [];
-let floorMoveFoil = [];
-
-let classic = [];
-let heart = [];
-let bigSize = [];
-let babbles = [];
-let withPaint = [];
-// let modelBalloon = [];
-
-const cleanOrPaintedFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('сердце','звезда','круг') ORDER BY id_balloon";
-const figureFlyFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('фигуры') ORDER BY id_balloon";
-const numberFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('цифра') ORDER BY id_balloon";
-const letterFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('буква') ORDER BY id_balloon";
-const floorMoveFoilFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('напольные') ORDER BY id_balloon";
-
-const classicFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('10','12','14','16','18') ORDER BY id_balloon";
-const heartFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('сердце') ORDER BY id_balloon";
-const bigSizeFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and size_inches IN ('24','26','27','30','36','40') ORDER BY id_balloon";
-const babblesFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('баблс') and form_factor IN ('шар') ORDER BY id_balloon";
-const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический') and texture_color IN ('дизайн') ORDER BY id_balloon";
-// const modelBalloonFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('моделирование') ORDER BY id_balloon";
-
-
-//фольга запрашиваем обьект прайс листа по категориям
-dataBaseQuery(cleanOrPaintedFoilFilter, function (result) {
-    cleanOrPaintedFoil = result.slice();
-});
-
-
-dataBaseQuery(figureFlyFoilFilter, function (result) {
-    figureFlyFoil = result.slice();
-});
-
-
-dataBaseQuery(numberFoilFilter, function (result) {
-    numberFoil = result.slice();
-});
-
-dataBaseQuery(letterFoilFilter, function (result) {
-    letterFoil = result.slice();
-});
-
-dataBaseQuery(floorMoveFoilFilter, function (result) {
-    floorMoveFoil = result.slice();
-});
-
-
-//латекс запрашиваем обьект прайс листа по категориям
-dataBaseQuery(classicFilter, function (result) {
-    classic = result.slice();
-});
-
-dataBaseQuery(heartFilter, function (result) {
-    heart = result.slice();
-});
-
-dataBaseQuery(bigSizeFilter, function (result) {
-    bigSize = result.slice();
-});
-
-dataBaseQuery(babblesFilter, function (result) {
-    babbles = result.slice();
-});
-
-dataBaseQuery(withPaintFilter, function (result) {
-    withPaint = result.slice();
-});
-
-// dataBaseQuery(modelBalloonFilter, function (result) {
-//     modelBalloon = result.slice();
-// });
-
 
 
 bot.on("callback_query", (msg) => {
@@ -575,93 +587,39 @@ bot.on("callback_query", (msg) => {
         previousMenu = "Ходилки";
 
     } else if (msg.data.toString() === "Круглые шары") {
+        cleanNewAddingBalloon();
         arrayValuesForEachKey = arrayFromPriceListKeys(classic);
-        interview()
-
-        // bot.editMessageText(
-        //     '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Круглые шары</a>' + `\n${chatOpponent}, вы открыли каталог классических латексных воздушных шаров.`,
-        //     {
-        //         chat_id: chatId,
-        //         message_id: messageId,
-        //         reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-        //         parse_mode: "HTML"
-        //     });
-
+        interview(classic);
         previousMenu = "Круглые шары";
 
     } else if (msg.data.toString() === "Шары для моделирования") {
+        // cleanNewAddingBalloon();
         // arrayValuesForEachKey = arrayFromPriceListKeys(modelBalloon);
-        // interview()
-
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Шары для моделирования</a>' + `\n${chatOpponent}, вы открыли каталог шаров для моделирования.`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-
+        // interview(modelBalloon)
         previousMenu = "Шары для моделирования";
 
     } else if (msg.data.toString() === "Сердца") {
+        cleanNewAddingBalloon();
         arrayValuesForEachKey = arrayFromPriceListKeys(heart);
-        interview()
-
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Сердца</a>' + `\n${chatOpponent}, вы открыли каталог шаров сердца.`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-
+        interview(heart);
         previousMenu = "Сердца";
 
     } else if (msg.data.toString() === "Большие шары") {
+        cleanNewAddingBalloon();
         arrayValuesForEachKey = arrayFromPriceListKeys(bigSize);
-        interview();
-
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Большие шары</a>' + `\n${chatOpponent}, вы открыли каталог больших шаров.`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-
+        interview(bigSize);
         previousMenu = "Большие шары";
 
-    } else if (msg.data.toString() === "Баблс") {
+    } else if (msg.data.toString() === "Сферы Баблс") {
+        cleanNewAddingBalloon();
         arrayValuesForEachKey = arrayFromPriceListKeys(babbles);
-        interview();
-
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Баблс</a>' + `\n${chatOpponent}, вы открыли каталог баблс.`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-
-        previousMenu = "Баблс";
+        interview(babbles);
+        previousMenu = "Сферы Баблс";
 
     } else if (msg.data.toString() === "Шары с рисунком") {
+        cleanNewAddingBalloon();
         arrayValuesForEachKey = arrayFromPriceListKeys(withPaint);
-        interview();
-
-        bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Шары с рисунком</a>' + `\n${chatOpponent}, вы открыли каталог шаров с рисунком.`,
-            {
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicCircleBallonsKeyboard),
-                parse_mode: "HTML"
-            });
-
+        interview(withPaint);
         previousMenu = "Шары с рисунком";
 
     } else if (interviewAnswer[0] === "опрос") {
@@ -670,10 +628,13 @@ bot.on("callback_query", (msg) => {
 
     //опрос покупателя по часто повторяющимся справшиваемым вопросам по шарам
     // с динамической генерацией клавиатуры и вопросов в зависимости от категории
-    function interview(data) {
+    function interview(category) {
         console.log('interview');
 
-        if (arrayValuesForEachKey.glue.length > 0 && !newAddingBalloon.glue) {
+        if (arrayValuesForEachKey.glue &&
+            arrayValuesForEachKey.glue.length > 1 &&
+            !newAddingBalloon.glue) {
+
             let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
             let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.glue, "glue");
 
@@ -685,7 +646,10 @@ bot.on("callback_query", (msg) => {
                     reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
                     parse_mode: "HTML"
                 });
-        } else if (arrayValuesForEachKey.texture_color.length > 0 && !newAddingBalloon.texture_color) {
+        } else if (arrayValuesForEachKey.texture_color &&
+            arrayValuesForEachKey.texture_color.length > 1 &&
+            !newAddingBalloon.texture_color) {
+
             let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
             let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.texture_color, "texture_color");
 
@@ -698,6 +662,87 @@ bot.on("callback_query", (msg) => {
                     reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
                     parse_mode: "HTML"
                 });
+        } else if (arrayValuesForEachKey.size_inches &&
+            arrayValuesForEachKey.size_inches.length > 1 &&
+            !newAddingBalloon.size_inches) {
+
+            let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+            let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.size_inches, "size_inches");
+
+
+            bot.editMessageText(
+                '<a href="">Обработка</a>' + `Пожалуйста укажите какого размера вам нужен шар?`,
+                {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                    parse_mode: "HTML"
+                });
+        } else if (arrayValuesForEachKey.inner_atribut &&
+            arrayValuesForEachKey.inner_atribut.length > 1 &&
+            !newAddingBalloon.inner_atribut) {
+
+            let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+            let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.inner_atribut, "inner_atribut");
+
+
+            bot.editMessageText(
+                '<a href="">Обработка</a>' + `Некоторые шары можно наполнить различными конфети, перьями или даже игрушками. Нужен ли вам наполнитель?`,
+                {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                    parse_mode: "HTML"
+                });
+        } else if (arrayValuesForEachKey.printed_text &&
+            arrayValuesForEachKey.printed_text.length > 1 &&
+            !newAddingBalloon.printed_text) {
+
+            let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+            let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.printed_text, "printed_text");
+
+            console.log(arrayValuesForEachKey.made_in);
+            bot.editMessageText(
+                '<a href="">Обработка</a>' + `Нужен ли вам идивидуальный напечатанный текст на воздушном шаре?`,
+                {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                    parse_mode: "HTML"
+                });
+        } else if (arrayValuesForEachKey.made_in &&
+            arrayValuesForEachKey.made_in.length > 1 &&
+            !newAddingBalloon.made_in) {
+
+            let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
+            let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.made_in, "made_in");
+
+
+            bot.editMessageText(
+                '<a href="">Обработка</a>' + `Пожалуйста укажите производителя? Китай - немного дешевле США но уступает покачеству.`,
+                {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                    parse_mode: "HTML"
+                });
+        } else {
+            console.log('position price')
+            //[{}] искать по массиву обьектов совпадения с обьектом {}
+            //1 найти для ключа 1 создать массив
+            //в массиве 1 найти ключи 2 создать массив 2
+            //в
+            let newArray = [];
+            for (let key in newAddingBalloon){
+                if (newAddingBalloon[key]) {
+                    for (let i = 0; i < category.length; i++) {
+                        if (category[i][key] === newAddingBalloon[key]) {
+                            newArray = [].push(category[i])
+                        }
+                    }
+                }
+            }
+
         }
     }
 });
