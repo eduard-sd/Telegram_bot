@@ -100,7 +100,7 @@ function foilBallonsKeyboard() {
                 {text: "Цифры",callback_data: "Цифры"}
             ],
             [
-                {text: "Фольга с рисунка",callback_data: "Фольга с рисунка"},
+                {text: "Фольга с рисунком",callback_data: "Фольга с рисунком"},
                 {text: "Фольга без рисунка",callback_data: "Фольга без рисунка"}
             ],
             [
