@@ -40,7 +40,7 @@ function balloonsKeyboard() {
                 {text: "Стоимость по фото 🖼️", callback_data: "Стоимость по фото 🖼️"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [ {text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack}, {text: profile, callback_data: profile}]
         ]
     }
 }
@@ -54,7 +54,7 @@ function priceListKeyboard() {
                 {text: "Фольги-нные шары, фигуры",callback_data: "Фольги-нные шары, фигуры"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [{text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack},{text: profile, callback_data: profile}]
         ]
     }
 }
@@ -76,17 +76,17 @@ function classicBallonsKeyboard() {
                 {text: "Шары с рисунком",callback_data: "Шары с рисунком"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [{text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack},{text: profile, callback_data: profile}]
         ]
     }
 }
 
-//"Круглые шары"
+//"Шаблонные кнопки для каждой вкладки меню"
 function classicCircleBallonsKeyboard() {
     return {
         inline_keyboard: [
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [{text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack},{text: profile, callback_data: profile}]
         ]
     }
 }
@@ -108,7 +108,7 @@ function foilBallonsKeyboard() {
                 {text: "Ходилки",callback_data: "Ходилки"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [{text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack},{text: profile, callback_data: profile}]
         ]
     }
 }
@@ -119,7 +119,7 @@ function getPriceFromPhotoKeyboard() {
     return {
         inline_keyboard: [
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
-            [{text: profile, callback_data: profile}]
+            [{text: goBack, callback_data: goBack},{text: profile, callback_data: profile}]
         ]
     }
 }
@@ -129,7 +129,7 @@ function getPriceFromPhotoKeyboard() {
 function cartKeyboard() {
     return {
         inline_keyboard: [
-            [{text: "Оформить ✅", callback_data: "Оформить ✅"}]
+            [{text: goBack, callback_data: goBack},{text: "Оформить ✅", callback_data: "Оформить ✅"}]
         ]
     }
 }
@@ -142,7 +142,7 @@ function profileKeyboard() {
                 {text: "Мои заказы 📋",callback_data: "Мои заказы 📋"},
                 {text: "бонусы Спасибо 💰",callback_data: "бонусы Спасибо 💰"}
             ],
-            [ {text: cart, callback_data: cart}]
+            [{text: goBack, callback_data: goBack}, {text: cart, callback_data: cart}]
         ]
     }
 }
@@ -159,7 +159,7 @@ function faqKeyboard() {
                 {text: "Адреса",callback_data: "Адреса"},
                 {text: "Гарантии 👍",callback_data: "Гарантии 👍"}
             ],
-            [{text: cart, callback_data: cart}]
+            [{text: goBack, callback_data: goBack},{text: cart, callback_data: cart}]
         ]
     }
 }

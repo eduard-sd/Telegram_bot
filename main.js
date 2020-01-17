@@ -24,7 +24,7 @@ let previousMenu = '';
 let arrayValuesForEachKey = [];
 let currentCategory = '';
 
-//объект нового шара для опроса
+//Заполняем объект нового шара опрашивая клиента
 let newAddingBalloon = {
     glue: '',
     texture_color: '',
@@ -52,12 +52,14 @@ let filteredSelector = '';
 
 //функций редактирования запроса к базе по фильтру - новому обьекту шара newAddingBalloon
 function selectorBuilder(selector) {
-    console.log('function selectorBuilder');
     if (newAddingBalloon.size_inches) {
-        let tempFilter = selector.slice(0, -20);
+        let tempFilter = selector.slice(0, -20); //обрезаем шаблонный селектор к базе для дальнейшей подстановке параметров
+
         for (let i in newAddingBalloon) {
-            if (newAddingBalloon.hasOwnProperty(i)) {
+            if (newAddingBalloon.hasOwnProperty(i) && newAddingBalloon[i] !== 'null') {
                 tempFilter += ` and ${i} IN ('${newAddingBalloon[i]}')`
+            } else if (newAddingBalloon.hasOwnProperty(i) && newAddingBalloon[i] === 'null') {
+                tempFilter += ` and ${i}`+' IS NULL'
             }
         }
         return tempFilter + " ORDER BY id_balloon";
@@ -82,20 +84,6 @@ const babblesFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN
 const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('классический c рисунком') ORDER BY id_balloon";
 const modelBalloonFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('шар для моделирования') ORDER BY id_balloon";
 
-
-//добавление кнопки назад в клавиатуру
-function addBackButton(previousMenu, customKeyboard) {
-    let customKeyboardArray = customKeyboard.inline_keyboard;
-    for (let i = 0; i < customKeyboardArray.length; i++) {
-        if (i === customKeyboardArray.length - 1) {
-            if (customKeyboardArray[i][0].text !== "⬅ Назад") {
-                // customKeyboardArray[i].splice(0, 0, {text: "⬅ Назад", callback_data: previousMenu})
-                customKeyboardArray[i].splice(0, 0, {text: "⬅ Назад", callback_data: "⬅ Назад"})
-            }
-        }
-    }
-    return {inline_keyboard: customKeyboardArray};
-}
 
 //создание кнопок из ключей обьекта objectKey прайслиста и склеивание с основной клавиатурой customKeyboard
 function addPriceListKeyButtons (objectValue, objectKey) {
@@ -144,7 +132,7 @@ bot.on('contact', (msg) => {
     bot.sendMessage(
         chatId,
         `${fromName}, приступаем к расчету...`,
-        {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+        {reply_markup: keyboardBalloons}
     );
 
 
@@ -190,6 +178,18 @@ function arrayFromPriceListKeys (priceList) {
 };
 
 
+//функция добавления предыдущей вкладки меню в лист
+function checkAndPush(data) {
+    console.log("--------------");
+    if (previousMenuList[previousMenuList.length-1] !== data && previousMenu !== data) {
+        previousMenuList.push(data)
+    }
+    console.log("[list]", previousMenuList);
+    console.log("[last]", previousMenu);
+    console.log("--------------");
+}
+
+
 bot.on('text', (msg) => {
     const chatValue = msg.chat;
     const chatId = msg.chat.id;
@@ -209,11 +209,11 @@ bot.on('text', (msg) => {
             chatId,
             '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571498410/TelegramBotSharoladya/sharolandiay_noxiev.png">Шароландия</a>' + `\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
             {
-                reply_markup: addBackButton(previousMenu, keyboardBalloons),
+                reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
             }
         );
-        previousMenu = "Шары 🎈";
+        checkAndPush("Шары 🎈");
 
     } else if (msg.text.toString() === "Торты 🎂") {
 
@@ -221,7 +221,7 @@ bot.on('text', (msg) => {
         bot.sendMessage(
             chatId,
             `${chatOpponent}, вы нажали "отмена"`,
-            {reply_markup: addBackButton(previousMenu, keyboardBalloons)}
+            {reply_markup: keyboardDefault}
         );
     } else if (msg.text.toString().length >= 4 && msg.text.toString().length <= 8) {
         let message = msg.text.toString();
@@ -289,14 +289,17 @@ bot.on("callback_query", (msg) => {
 
     //если приходит колбек назад запускаю метод поп и меняю колбек
 
-    console.log("[list]", previousMenuList);
-    console.log("[last]", previousMenu);
-    console.log("[current]", msg.data);
-    console.log("--------------");
-
     if (answer === '⬅ Назад') {
-        if (previousMenuList.length >= 1) {
-            answer = previousMenuList.pop();
+        if (previousMenuList.length >= 2) {
+            previousMenuList.pop();
+
+            if (previousMenuList[previousMenuList.length-1] === 'Фольги-нные шары, фигуры опрос') {
+                previousMenuList.pop();
+            } else if (previousMenuList[previousMenuList.length-1] === 'Воздушные шары опрос') {
+                previousMenuList.pop();
+            }
+
+            answer = previousMenuList[previousMenuList.length-1];
             previousMenu = answer;
         } else {
             answer = 'Шары 🎈';
@@ -308,13 +311,7 @@ bot.on("callback_query", (msg) => {
     let interviewAnswer = msg.data.toString().split('.');
     if (interviewAnswer[1] && interviewAnswer[2]) {
         newAddingBalloon[interviewAnswer[1]] = interviewAnswer[2];
-        console.log(newAddingBalloon[interviewAnswer[1]],'----- in to object')
-    }
-
-    function checkAndPush(data) {
-        if (previousMenuList[previousMenuList.length-1] !== data && previousMenu !== data) {
-            previousMenuList.push(data)
-        }
+        // console.log(newAddingBalloon[interviewAnswer[1]],'----- in to object')
     }
 
 
@@ -324,7 +321,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, keyboardBalloons),
+                reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
             });
         checkAndPush("Шары 🎈");
@@ -335,7 +332,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, priceListKeyboard),
+                reply_markup: priceListKeyboard,
                 parse_mode: "HTML"
             });
         checkAndPush("Каталог и цены 🎁");
@@ -346,7 +343,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, getPriceFromPhotoKeyboard)
+                reply_markup: getPriceFromPhotoKeyboard
             })
             .then(() => {
                 bot.on('photo', (msg) => {
@@ -384,7 +381,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, faqKeyboard)
+                reply_markup: faqKeyboard
             });
         checkAndPush("Вопросы и ответы ❓");
 
@@ -394,7 +391,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, faqKeyboard)
+                reply_markup: faqKeyboard
             });
         checkAndPush("Как заказать ❓");
 
@@ -404,7 +401,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, faqKeyboard)
+                reply_markup: faqKeyboard
             });
         checkAndPush("Доставка 🚚");
 
@@ -414,7 +411,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, faqKeyboard)
+                reply_markup: faqKeyboard
             });
         checkAndPush("Адреса");
 
@@ -424,7 +421,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, faqKeyboard)
+                reply_markup: faqKeyboard
             });
         checkAndPush("Гарантии 👍");
 
@@ -436,7 +433,7 @@ bot.on("callback_query", (msg) => {
                 {
                     chat_id: chatId,
                     message_id: messageId,
-                    reply_markup: addBackButton(previousMenu, cartKeyboard)
+                    reply_markup: cartKeyboard
                 });
         } else {
             bot.editMessageText(
@@ -444,7 +441,7 @@ bot.on("callback_query", (msg) => {
                 {
                     chat_id: chatId,
                     message_id: messageId,
-                    reply_markup: addBackButton(previousMenu, cartKeyboard)
+                    reply_markup: cartKeyboard
                 });
         }
         checkAndPush("Корзина 📦");
@@ -455,7 +452,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, profileKeyboard)
+                reply_markup: profileKeyboard
             });
         checkAndPush("Личный кабинет 💼");
 
@@ -465,7 +462,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, classicBallonsKeyboard),
+                reply_markup: classicBallonsKeyboard,
                 parse_mode: "HTML"
             });
         checkAndPush("Воздушные шары");
@@ -476,7 +473,7 @@ bot.on("callback_query", (msg) => {
             {
                 chat_id: chatId,
                 message_id: messageId,
-                reply_markup: addBackButton(previousMenu, foilBallonsKeyboard),
+                reply_markup: foilBallonsKeyboard,
                 parse_mode: "HTML"
             });
 
@@ -486,77 +483,78 @@ bot.on("callback_query", (msg) => {
         cleanNewAddingBalloon();
         currentCategory = figureFlyFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
     } else if (answer === "Цифры") {
         cleanNewAddingBalloon();
         currentCategory = numberFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
 
     } else if (answer === "Фольга с рисунком") {
         cleanNewAddingBalloon();
         currentCategory = paintedFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
     } else if (answer === "Фольга без рисунка") {
         cleanNewAddingBalloon();
         currentCategory = cleanFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
     } else if (answer === "Буквы") {
         cleanNewAddingBalloon();
         currentCategory = letterFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
     } else if (answer === "Ходилки") {
         cleanNewAddingBalloon();
         currentCategory = floorMoveFoilFilter;
         interview();
-        checkAndPush("Фольги-нные шары, фигуры")
+        checkAndPush("Фольги-нные шары, фигуры опрос");
 
     } else if (answer === "Круглые шары") {
         cleanNewAddingBalloon();
         currentCategory = classicFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (answer === "Шары для моделирования") {
         cleanNewAddingBalloon();
         currentCategory = modelBalloonFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (answer === "Сердца") {
         cleanNewAddingBalloon();
         currentCategory = heartFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (answer === "Большие шары") {
         cleanNewAddingBalloon();
         currentCategory = bigSizeFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (answer === "Сферы Баблс") {
         cleanNewAddingBalloon();
         currentCategory = babblesFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (answer === "Шары с рисунком") {
         cleanNewAddingBalloon();
         currentCategory = withPaintFilter;
         interview();
-        checkAndPush("Воздушные шары");
+        checkAndPush("Воздушные шары опрос");
 
     } else if (interviewAnswer[0] === "опрос") {
         interview();
+
     }
 
 
@@ -566,7 +564,6 @@ bot.on("callback_query", (msg) => {
     // с динамической генерацией клавиатуры и вопросов в зависимости от категории
     function interview() {
         console.log('function interview');
-        currentCategory.includes('фольгированные') ? checkAndPush("Фольги-нные шары, фигуры") : checkAndPush("Воздушные шары");
 
         filteredSelector = selectorBuilder(currentCategory);//отправить объект нового шара для выборки
         // console.log(filteredSelector);
@@ -579,7 +576,6 @@ bot.on("callback_query", (msg) => {
                 arrayValuesForEachKey.size_inches.length > 1 &&
                 !newAddingBalloon.size_inches) {
 
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.size_inches, "size_inches");
 
                 bot.editMessageText(
@@ -587,15 +583,13 @@ bot.on("callback_query", (msg) => {
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else if (arrayValuesForEachKey.texture_color &&
                 arrayValuesForEachKey.texture_color.length > 1 &&
                 !newAddingBalloon.texture_color) {
 
-
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.texture_color, "texture_color");
 
                 bot.editMessageText(
@@ -603,44 +597,41 @@ bot.on("callback_query", (msg) => {
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else if (arrayValuesForEachKey.glue &&
                 arrayValuesForEachKey.glue.length > 1 &&
                 !newAddingBalloon.glue) {
 
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.glue, "glue");
 
                 bot.editMessageText(
-                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1575315719/TelegramBotSharoladya/hifloat_kvzf7x.png">🎬 В чём разница у шаров с обработкой Hi-Float и без?</a> \n\nШары без обработки летают 10-12 часов, с обработкой время полёта значительно увеличивается до 3-7 дней (в зависимости от типа шарика и внешних условий). В идеальных условиях шарик с обработкой может "жить" до месяца! \n\nЧтобы ответить на него наиболее наглядно мы сняли это видео. https://youtu.be/1fhV798ay1k \n\nПожалуйста укажите, вам шар с обработкой ?\n',
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1575315719/TelegramBotSharoladya/hifloat_kvzf7x.png">🎬 В чём разница у шаров с обработкой и без?</a> \n\nСколько вы хотите чтоб летал ваш шарик? \nдо 10-12 часов  👉  Нет \nдо 3-7 дней  👉  Да\n',
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else if (arrayValuesForEachKey.inner_atribut &&
                 arrayValuesForEachKey.inner_atribut.length > 1 &&
                 !newAddingBalloon.inner_atribut) {
 
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.inner_atribut, "inner_atribut");
 
                 bot.editMessageText(
-                    '<a href="">Наполнитель</a> \n\nНекоторые шары можно украсить различными атрибутами: конфети, перьями, светодиодами или даже игрушками. \n\nПожалуйста укажите, Нужен ли вам наполнитель?',
+                    '<a href="">Наполнитель</a> \n\nВы можете дополнить ваш шарик: \nконфети, \nперьями, \nсветодиодами, \nигрушками. \n\nУкажите наполнитель?',
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else if (arrayValuesForEachKey.printed_text &&
                 arrayValuesForEachKey.printed_text.length > 1 &&
                 !newAddingBalloon.printed_text) {
 
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.printed_text, "printed_text");
 
 
@@ -649,14 +640,13 @@ bot.on("callback_query", (msg) => {
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else if (arrayValuesForEachKey.made_in &&
                 arrayValuesForEachKey.made_in.length > 1 &&
                 !newAddingBalloon.made_in) {
 
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.made_in, "made_in");
 
                 bot.editMessageText(
@@ -664,7 +654,7 @@ bot.on("callback_query", (msg) => {
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: concatButtons(dynamicKeyboard, standartKeyboard.inline_keyboard),
+                        reply_markup: concatButtons(dynamicKeyboard, classicCircleBallonsKeyboard.inline_keyboard),
                         parse_mode: "HTML"
                     });
             } else {
@@ -684,7 +674,6 @@ bot.on("callback_query", (msg) => {
                 //         }
                 //     }
                 // }
-                let standartKeyboard = addBackButton(previousMenu, classicCircleBallonsKeyboard);
                 console.log('filtered positions = ',filteredByConstructor.length);
 
                 bot.editMessageText(
@@ -692,7 +681,7 @@ bot.on("callback_query", (msg) => {
                     {
                         chat_id: chatId,
                         message_id: messageId,
-                        reply_markup: standartKeyboard,
+                        reply_markup: classicCircleBallonsKeyboard,
                         parse_mode: "HTML"
                     });
 
@@ -757,12 +746,12 @@ function makeString(data) {
 
         let material = data[0].material ? `Материал: ${data[0].material}, ` : ``;
         let formFactor = data[0].form_factor ? `Форма: ${data[0].form_factor}, ` : ``;
-        let glue = data[0].glue ? `Обработка: ${data[0].glue}\n` : ``;
+        let glue = data[0].glue === 'true' ? `Обработка: да, ` : `Обработка: нет, `;
         let textureColor = data[0].texture_color ?`Текстура: ${data[0].texture_color}, ` : ``;
         let sizeInches = data[0].size_inches ? `Дюймов: ${data[0].size_inches}, ` : ``;
         let sizeSm = data[0].size_sm ? `Сантиметров: ${data[0].size_sm}, ` : ``;
-        let innerAtribut = data[0].inner_atribut ? `Наполнитель: ${data[0].inner_atribut}, ` : ``;
-        let printedText = data[0].printed_text ? `Свой текст: ${data[0].printed_text}, ` : ``;
+        let innerAtribut = data[0].inner_atribut === 'null' ? `Наполнитель: нет, ` : `Наполнитель: ${data[0].inner_atribut}, `;
+        let printedText = data[0].printed_text === 'true' ? `Свой текст: да, ` : `Свой текст: нет, `;
         let madeIn = data[0].made_in ? `Произведено: ${data[0].made_in} ` : ``;
 
         let price = data[0].price ? `<strong>💵 Цена (1шт):</strong> ${data[0].price} рублей\n` : ``;
