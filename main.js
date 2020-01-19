@@ -337,7 +337,7 @@ bot.on("callback_query", (msg) => {
             });
         checkAndPush("Каталог и цены 🎁");
 
-    } else if (answer === "Стоимость по фото 🖼️") {
+    } else if (answer === "Цена по фото 📸") {
         bot.editMessageText(
             `${chatOpponent}` + ', пожалуйста прикрепите к сообщению понравившиеся фотографии или композиции, и нажмите отправить. \n\n📲 С вами свяжется специалит для дальнейшей консультаци по стоимости. \n\n⏱ Примерное время ответа ответа 30 минут.',
             {
@@ -373,7 +373,7 @@ bot.on("callback_query", (msg) => {
                     60000
                 );
             });
-        checkAndPush("Стоимость по фото 🖼️");
+        checkAndPush("Цена по фото 📸");
 
     } else if (answer === "Вопросы и ответы ❓") {
         bot.editMessageText(
@@ -579,7 +579,7 @@ bot.on("callback_query", (msg) => {
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.size_inches, "size_inches");
 
                 bot.editMessageText(
-                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1575313729/TelegramBotSharoladya/razmery_sharov-1_y7rheq.jpg">Размеры шаров</a> \n\nПожалуйста укажите, какого размера вам нужен шар?',
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579445429/TelegramBotSharoladya/razmery_sharov-1_d55lpj.jpg">Размеры шаров</a> \n\nКакого размера вам нужен шар?',
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -593,7 +593,7 @@ bot.on("callback_query", (msg) => {
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.texture_color, "texture_color");
 
                 bot.editMessageText(
-                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1572645575/TelegramBotSharoladya/Frame_1_mey6ns.png">Текстура и доступная палитра цветов</a> \n\nВоздушные шары бывают различной текстуры и оттенка. Агат, металик, хром дороже пастельных оттенков (примерно на 20 - 40 руб в зависимости от размера).  \n\nПожалуйста укажите, какая текстура вам нужна?',
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579445400/TelegramBotSharoladya/texture_fqfxli.jpg">Окрас шаров</a> \n\nВарианты текстур воздушных шаров:\nагат, \nметалик, \nхром, \nпастель, \nпрозрачный \n\nКакая текстура вам нужна?',
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -607,7 +607,7 @@ bot.on("callback_query", (msg) => {
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.glue, "glue");
 
                 bot.editMessageText(
-                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1575315719/TelegramBotSharoladya/hifloat_kvzf7x.png">🎬 В чём разница у шаров с обработкой и без?</a> \n\nСколько вы хотите чтоб летал ваш шарик? \nдо 10-12 часов  👉  Нет \nдо 3-7 дней  👉  Да\n',
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579445430/TelegramBotSharoladya/glue_myv5zw.jpg">Время полета</a> \n\nСколько вы хотите чтоб летал ваш шарик? \nдо 10-12 часов  👉  Нет \nдо 3-7 дней  👉  Да\n',
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -621,7 +621,7 @@ bot.on("callback_query", (msg) => {
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.inner_atribut, "inner_atribut");
 
                 bot.editMessageText(
-                    '<a href="">Наполнитель</a> \n\nВы можете дополнить ваш шарик: \nконфети, \nперьями, \nсветодиодами, \nигрушками. \n\nУкажите наполнитель?',
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579452271/TelegramBotSharoladya/inner-atribut_yom998.jpg">Наполнитель</a> \n\nВы можете дополнить ваш шарик: \n🎊конфетти, \n🕊искусственными перьями, \n✨светодиодами. \n\nУкажите наполнитель?',
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -636,7 +636,7 @@ bot.on("callback_query", (msg) => {
 
 
                 bot.editMessageText(
-                    '<a href="">Текст на шаре</a>' + `\n\nНужен ли вам идивидуальный напечатанный текст на воздушном шаре?`,
+                    '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579452458/TelegramBotSharoladya/balloon-with-text_1_xrjkzj.png">Текст на шаре</a>' + `\n\nНужен ли вам идивидуальный напечатанный текст на воздушном шаре?`,
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -650,7 +650,7 @@ bot.on("callback_query", (msg) => {
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.made_in, "made_in");
 
                 bot.editMessageText(
-                    '<a href="">Обработка</a> \n\nПожалуйста укажите производителя? Китай - немного дешевле США но уступает покачеству.',
+                    '<a href="">Обработка</a> \n\nВыберите производителя? Китай - немного дешевле США но уступает покачеству.',
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -750,7 +750,7 @@ function makeString(data) {
         let textureColor = data[0].texture_color ?`Текстура: ${data[0].texture_color}, ` : ``;
         let sizeInches = data[0].size_inches ? `Дюймов: ${data[0].size_inches}, ` : ``;
         let sizeSm = data[0].size_sm ? `Сантиметров: ${data[0].size_sm}, ` : ``;
-        let innerAtribut = data[0].inner_atribut === 'null' ? `Наполнитель: нет, ` : `Наполнитель: ${data[0].inner_atribut}, `;
+        let innerAtribut = data[0].inner_atribut === null ? `Наполнитель: нет, ` : `Наполнитель: ${data[0].inner_atribut}, `;
         let printedText = data[0].printed_text === 'true' ? `Свой текст: да, ` : `Свой текст: нет, `;
         let madeIn = data[0].made_in ? `Произведено: ${data[0].made_in} ` : ``;
 

@@ -37,7 +37,7 @@ function balloonsKeyboard() {
         inline_keyboard: [
             [
                 {text: "Каталог и цены 🎁", callback_data: "Каталог и цены 🎁"},
-                {text: "Стоимость по фото 🖼️", callback_data: "Стоимость по фото 🖼️"}
+                {text: "Цена по фото 📸", callback_data: "Цена по фото 📸"}
             ],
             [{text: questionsAndAnswers, callback_data: questionsAndAnswers}, {text: cart, callback_data: cart}],
             [{text: goBack, callback_data: goBack}, {text: profile, callback_data: profile}]
