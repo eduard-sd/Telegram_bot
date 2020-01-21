@@ -225,53 +225,58 @@ bot.on('text', (msg) => {
             `${chatOpponent}, вы нажали "отмена"`,
             {reply_markup: keyboardDefault}
         );
-    } else if (msg.text.toString().length >= 4 && msg.text.toString().length <= 8) {
-        let message = msg.text.toString();
-        checkDashInString();
-
-        function checkDashInString() {
-            let dash = 0;
-            for (let i = 0; i < message.length; i++) {
-                if (message[i] === "-") {
-                    dash++
-                }
-            }
-
-            if (dash === 2) {
-                let messageArray = message.split("-");
-                checkNumberNotZero(messageArray);
-            } else {
-                console.log('Wrong type of message')
-            }
-        }
-
-        function checkNumberNotZero(messageArray) {
-            for (let i = 0; i < messageArray.length; i++) {
-                if (i === 0) {
-                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-                        console.log('Wrong article, cant be empty or with letters');
-                    } else if (parseInt(messageArray[i]) === 0) {
-                        console.log(isNaN(messageArray[i]), 'Article cant be zero');
-                    }
-                } else if (i === 1) {
-                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-                        console.log('Wrong color, cant be empty or with letters');
-                    } else if (parseInt(messageArray[i]) === 0) {
-                        console.log(isNaN(messageArray[i]), 'Color cant be zero');
-                    }
-                } else if (i === 2) {
-                    if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-                        console.log('Wrong count, cant be empty or with letters');
-                    } else if (parseInt(messageArray[i]) === 0) {
-                        console.log(isNaN(messageArray[i]), 'Count cant be zero');
-                    }
-                }
-            }
-        }
-
     } else {
         console.log('Wrong type of message')
+        bot.sendMessage(
+            chatId,
+            `${chatOpponent}, к сожалению в моей базе данных нет доступных команд по вашему слову `+`${msg.text.toString()}`+' \n\nВарианты доступных команд:\n/Шары 🎈\n/start',
+            {reply_markup: keyboardDefault}
+        );
     }
+    // else if (msg.text.toString().length >= 4 && msg.text.toString().length <= 8) {
+    //     let message = msg.text.toString();
+    //     checkDashInString();
+    //
+    //     function checkDashInString() {
+    //         let dash = 0;
+    //         for (let i = 0; i < message.length; i++) {
+    //             if (message[i] === "-") {
+    //                 dash++
+    //             }
+    //         }
+    //
+    //         if (dash === 2) {
+    //             let messageArray = message.split("-");
+    //             checkNumberNotZero(messageArray);
+    //         } else {
+    //             console.log('Wrong type of message')
+    //         }
+    //     }
+    //
+    //     function checkNumberNotZero(messageArray) {
+    //         for (let i = 0; i < messageArray.length; i++) {
+    //             if (i === 0) {
+    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+    //                     console.log('Wrong article, cant be empty or with letters');
+    //                 } else if (parseInt(messageArray[i]) === 0) {
+    //                     console.log(isNaN(messageArray[i]), 'Article cant be zero');
+    //                 }
+    //             } else if (i === 1) {
+    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+    //                     console.log('Wrong color, cant be empty or with letters');
+    //                 } else if (parseInt(messageArray[i]) === 0) {
+    //                     console.log(isNaN(messageArray[i]), 'Color cant be zero');
+    //                 }
+    //             } else if (i === 2) {
+    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
+    //                     console.log('Wrong count, cant be empty or with letters');
+    //                 } else if (parseInt(messageArray[i]) === 0) {
+    //                     console.log(isNaN(messageArray[i]), 'Count cant be zero');
+    //                 }
+    //             }
+    //         }
+    //     }
+
 });
 
 
@@ -330,7 +335,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Каталог и цены 🎁") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502686/TelegramBotSharoladya/catalog_ktpfa6.png">Каталог и цены 🎁</a> \n' + `${chatOpponent}, вы открыли каталог и цены`+' \n\nАкция! 📣\nОформи заказ с помощью бота 🤖 и получите бонусы спасибо. \nЗа каждые потраченные 10₽ начислим 1 балл.\n1 балл = 1 рублю 💸\n\n🔺В акции не участвует услуга «цена по фото».',
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579638704/TelegramBotSharoladya/catalog_ydggjb.png">Каталог и цены 🎁</a> \n' + `${chatOpponent}, вы открыли каталог и цены`+' \n\nАкция! 📣\nОформи заказ с помощью бота 🤖 и получите бонусы спасибо. \nЗа каждые потраченные 10₽ начислим 1 балл.\n1 балл = 1 рублю 💸\n\n🔺В акции не участвует услуга «цена по фото».',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -399,7 +404,16 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Доставка 🚚") {
         bot.editMessageText(
-            'Доставка 🚚',
+            'Доставка 🚚\n' +
+            '\nДоставка воздушных шаров осуществляется ежедневно и круглосуточно. Минимальная сумма заказа - 1000 руб. (без учета стоимости доставки).\n' +
+            'С 9.00 до 22.00 стоимость доставки в г. Казани - 250 рублей.\n' +
+            'С 9.00 до 22.00 стоимость доставки в г. Иннополис - 100 рублей.\n' +
+            '\nДоставка до пункта выдачи по одному из адресов осуществляется - бесплатно' +
+            '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской' +
+            '\n🎯Казань ул. Ямашева д.103​, пункт выдачи' +
+            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи' +
+            '\n🎯Иннополис ул. ​Спортивная, д.132 пункт выдачи' +
+            '\n\nМы доставляем шары в часовом интервале от вашего времени, т.е. если заказываете шары к определенному времени то от этого времени + - 30 мин. ',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -409,7 +423,11 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Адреса") {
         bot.editMessageText(
-            'Адреса',
+            'Список адресов пунктов выдачи воздушных шаров: \n' +
+            '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской ' +
+            '\n🎯Казань ул. Ямашева д.103​, пункт выдачи ' +
+            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ' +
+            '\n🎯Иннополис ул. ​Спортивная, д.132 пункт выдачи',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -419,7 +437,16 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Гарантии 👍") {
         bot.editMessageText(
-            'Гарантии 👍',
+            'Гарантии 👍 \n\nЕсли по каким-либо причинам Вы остались недовольны исполнением Вашего заказа, мы произведем повторную доставку или вернем деньги.\n' +
+            '\nГарантия на полет воздушных шаров с гелием 3 дня (72 часа) с момента получения заказа. Гарантия распространяется на латексные, фольгированные и светящиея шарики с гелием.\n' +
+            '\nГарантийные случаи\n' +
+            '\nЕсли до истечения гарантийного срока ( 3 дня с момента получения ) Вы обнаружите, что более 10% воздушных шаров сдулись или потеряли более 50% объема от первоначального, то есть сдулись, то Вам необходимо сделать фото шаров и прислать нам в Telegram по телефону: +7(967)367‒71‒97\n' +
+            '\n' +
+            'Мы постараемся максимально быстро в течение 24 часов заменить воздушные шары на новые или вернуть денежные средства как удобнее заказчику.\n' +
+            '\n' +
+            'Негарантийные случаи\n' +
+            '\n' +
+            'Гарантия на воздушные шары не распространяется, если сдутие шаров произошло по вине клиента - по причине механического или прокола, а так же хранение на холоде, оптимальная температура от 20 до 23 градусов. Просим Вас быть осторожными, шарики требуют бережного обращения.',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -462,7 +489,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Воздушные шары") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571502015/TelegramBotSharoladya/classic_exqdvy.png">Воздушные шары</a>' + `\n${chatOpponent}, вы открыли каталог классических воздушных шаров`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579638705/TelegramBotSharoladya/classic_o9nta7.png">Воздушные шары</a>' + `\n${chatOpponent}, вы открыли каталог классических воздушных шаров`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -473,7 +500,7 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Фольги-нные шары, фигуры") {
         bot.editMessageText(
-            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1571501721/TelegramBotSharoladya/foil_rhy8vw.png">Фольгированные шары, фигуры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных шаров`,
+            '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579638705/TelegramBotSharoladya/foil_eplatq.png">Фольгированные шары, фигуры</a>' + `\n${chatOpponent}, вы открыли каталог фольгированных шаров`,
             {
                 chat_id: chatId,
                 message_id: messageId,

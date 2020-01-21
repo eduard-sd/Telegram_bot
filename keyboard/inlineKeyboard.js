@@ -18,6 +18,7 @@ function keyboardDefault() {
 function sendVCard() {
     return {
         reply_markup: {
+            resize_keyboard: true,
             one_time_keyboard: true,
             keyboard: [
                 [{text: "Мой номер телефона",request_contact: true}],
