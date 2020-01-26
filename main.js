@@ -41,6 +41,8 @@ const imageLinks = {
     pastelColorImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579984086/TelegramBotSharoladya/pastel_color_pspppo.png">Палитра</a>',
     chromColorImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579984086/TelegramBotSharoladya/chrom_color_t2ojho.png">Палитра хром</a>',
     metalicColorImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579984086/TelegramBotSharoladya/metalic_color_na5ufe.png">Палитра металик</a>',
+    foilFormWithPainImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1580057526/TelegramBotSharoladya/foil_form_with_pain_zmhj6d.png">Форма шаров с рисунком</a>',
+    foilFormImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1580056744/TelegramBotSharoladya/foil_form_without_pain_obcx82.png">Форма шаров без рисунком</a>',
 
 };
 
@@ -711,11 +713,18 @@ bot.on("callback_query", (msg) => {
                 arrayValuesForEachKey.form_factor.length > 1 &&
                 !newAddingBalloon.form_factor) {
 
+                let fotoLink = '';
                 let dynamicKeyboard = addPriceListKeyButtons(arrayValuesForEachKey.form_factor, "form_factor");
-
+                if (currentCategory.includes('звезда с рисунком') ||
+                    currentCategory.includes('сердце с рисунком') ||
+                    currentCategory.includes('круг с рисунком')) {
+                    fotoLink = imageLinks.foilFormWithPainImg;
+                } else {
+                    fotoLink = imageLinks.foilFormImg;
+                }
 
                 bot.editMessageText(
-                    `\n\nВыберите форму шара?✏️`,
+                    `${fotoLink} \n\nВыберите форму шара?`,
                     {
                         chat_id: chatId,
                         message_id: messageId,
@@ -780,10 +789,37 @@ bot.on("callback_query", (msg) => {
                         parse_mode: "HTML",
                     }
                 );
+
+                // let fotoLink = '';
+                // let dynamicKeyboard;
+                //
+                // if (newAddingBalloon.texture_color === 'агат') {
+                //     fotoLink = imageLinks.agatColorImg;
+                //     dynamicKeyboard = agatColorsKeyboard.inline_keyboard;
+                //
+                // } else if (newAddingBalloon.texture_color === 'хром') {
+                //     fotoLink = imageLinks.chromColorImg;
+                //     dynamicKeyboard = chromColorsKeyboard.inline_keyboard;
+                //
+                // } else if (newAddingBalloon.texture_color === 'металик') {
+                //     fotoLink = imageLinks.metalicColorImg;
+                //     dynamicKeyboard = metalicColorsKeyboard.inline_keyboard;
+                //
+                // } else {
+                //     fotoLink = imageLinks.pastelColorImg;
+                //     dynamicKeyboard = pastelColorsKeyboard.inline_keyboard;
+                // }
+                //
+                // bot.editMessageText(
+                //     `${fotoLink} Выберите цвет`,
+                //     {
+                //         chat_id: chatId,
+                //         message_id: messageId,
+                //         reply_markup: concatButtons(dynamicKeyboard, classicCircleBalloonsKeyboard.inline_keyboard),
+                //         parse_mode: "HTML"
+                //     });
             } else {
                 console.log('miss')
-                console.log('filteredByConstructor.length',filteredByConstructor.length)
-                console.log('filteredByConstructor',filteredByConstructor)
             }
         });
     }
