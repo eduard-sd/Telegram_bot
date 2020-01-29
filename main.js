@@ -258,50 +258,6 @@ bot.on('text', (msg) => {
             {reply_markup: keyboardDefault}
         );
     }
-    // else if (msg.text.toString().length >= 4 && msg.text.toString().length <= 8) {
-    //     let message = msg.text.toString();
-    //     checkDashInString();
-    //
-    //     function checkDashInString() {
-    //         let dash = 0;
-    //         for (let i = 0; i < message.length; i++) {
-    //             if (message[i] === "-") {
-    //                 dash++
-    //             }
-    //         }
-    //
-    //         if (dash === 2) {
-    //             let messageArray = message.split("-");
-    //             checkNumberNotZero(messageArray);
-    //         } else {
-    //             console.log('Wrong type of message')
-    //         }
-    //     }
-    //
-    //     function checkNumberNotZero(messageArray) {
-    //         for (let i = 0; i < messageArray.length; i++) {
-    //             if (i === 0) {
-    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-    //                     console.log('Wrong article, cant be empty or with letters');
-    //                 } else if (parseInt(messageArray[i]) === 0) {
-    //                     console.log(isNaN(messageArray[i]), 'Article cant be zero');
-    //                 }
-    //             } else if (i === 1) {
-    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-    //                     console.log('Wrong color, cant be empty or with letters');
-    //                 } else if (parseInt(messageArray[i]) === 0) {
-    //                     console.log(isNaN(messageArray[i]), 'Color cant be zero');
-    //                 }
-    //             } else if (i === 2) {
-    //                 if (!parseInt(messageArray[i]) || isNaN(messageArray[i])) {
-    //                     console.log('Wrong count, cant be empty or with letters');
-    //                 } else if (parseInt(messageArray[i]) === 0) {
-    //                     console.log(isNaN(messageArray[i]), 'Count cant be zero');
-    //                 }
-    //             }
-    //         }
-    //     }
-
 });
 
 bot.on("callback_query", (msg) => {
