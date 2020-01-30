@@ -272,6 +272,39 @@ function pastelColorsKeyboard() {
 }
 
 
+//создание кнопок из масива значений objectValue, для склеивания с основной клавиатурой customKeyboard
+//objectValue - массив значений по ключу
+//objectKey - ключ
+function addPriceListKeyButtons (objectValue, objectKey) {
+    console.log('function addPriceListKeyButtons');
+
+    let arrayButtons = [];
+    let temp = [];
+
+    for(let k = 0; k < objectValue.length; k++) {
+        let data = '';
+        if (objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'true') {
+            data = 'Да';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'false') {
+            data = 'Нет';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'object') {
+            data = 'Нет';
+        } else {
+            data = objectValue[k]
+        }
+
+        temp.push({text: data,callback_data: 'опрос.'+objectKey+'.'+objectValue[k]});
+        if((k+1) % 4 === 0) {
+            arrayButtons.push(temp);
+            temp = []
+        } else if(k+1 === objectValue.length ) {
+            arrayButtons.push(temp)
+        }
+    }
+    return arrayButtons;
+}
+
+
 
 
 module.exports.keyboardDefault = keyboardDefault;
@@ -291,3 +324,4 @@ module.exports.agatColorsKeyboard = agatColorsKeyboard;
 module.exports.chromColorsKeyboard = chromColorsKeyboard;
 module.exports.metalicColorsKeyboard = metalicColorsKeyboard;
 module.exports.pastelColorsKeyboard = pastelColorsKeyboard;
+module.exports.addPriceListKeyButtons = addPriceListKeyButtons;

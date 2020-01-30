@@ -22,6 +22,7 @@ const agatColorsKeyboard = keyboard.agatColorsKeyboard();
 const chromColorsKeyboard = keyboard.chromColorsKeyboard();
 const metalicColorsKeyboard = keyboard.metalicColorsKeyboard();
 const pastelColorsKeyboard = keyboard.pastelColorsKeyboard();
+const addPriceListKeyButtons = keyboard.addPriceListKeyButtons();
 
 
 //'+`${imageLinks.balloonWithTextImg}`+'
@@ -113,35 +114,7 @@ const withPaintFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  
 const modelBalloonFilter = "SELECT * FROM telegramdb.balloonprice WHERE  material  IN ('латекс') and form_factor IN ('шар для моделирования') ORDER BY id_balloon";
 
 
-//создание кнопок из ключей обьекта objectKey прайслиста и склеивание с основной клавиатурой customKeyboard
-function addPriceListKeyButtons (objectValue, objectKey) {
-    console.log('function addPriceListKeyButtons');
 
-    let arrayButtons = [];
-    let temp = [];
-
-    for(let k = 0; k < objectValue.length; k++) {
-        let data = '';
-        if (objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'true') {
-            data = 'Да';
-        } else if (!objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'false') {
-            data = 'Нет';
-        } else if (!objectValue[k] && typeof objectValue[k] === 'object') {
-            data = 'Нет';
-        } else {
-            data = objectValue[k]
-        }
-
-        temp.push({text: data,callback_data: 'опрос.'+objectKey+'.'+objectValue[k]});
-        if((k+1) % 4 === 0) {
-            arrayButtons.push(temp);
-            temp = []
-        } else if(k+1 === objectValue.length ) {
-            arrayButtons.push(temp)
-        }
-    }
-    return arrayButtons;
-}
 
 //склеивание кнопок в клавиатуру
 function concatButtons (fistkeyboard, secondkeyboard) {
