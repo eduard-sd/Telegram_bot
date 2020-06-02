@@ -22,7 +22,7 @@ const agatColorsKeyboard = keyboard.agatColorsKeyboard();
 const chromColorsKeyboard = keyboard.chromColorsKeyboard();
 const metalicColorsKeyboard = keyboard.metalicColorsKeyboard();
 const pastelColorsKeyboard = keyboard.pastelColorsKeyboard();
-const addPriceListKeyButtons = keyboard.addPriceListKeyButtons();
+
 
 
 //'+`${imageLinks.balloonWithTextImg}`+'
@@ -121,6 +121,40 @@ function concatButtons (fistkeyboard, secondkeyboard) {
     return {inline_keyboard: fistkeyboard.concat(secondkeyboard)};
 }
 
+
+//создание кнопок из масива значений objectValue, для склеивания с основной клавиатурой customKeyboard
+//objectValue - массив значений по ключу
+//objectKey - ключ
+function addPriceListKeyButtons (objectValue, objectKey) {
+    console.log('function addPriceListKeyButtons');
+
+    let arrayButtons = [];
+    let temp = [];
+
+    for(let k = 0; k < objectValue.length; k++) {
+        let data = '';
+        if (objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'true') {
+            data = 'Да';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'boolean' || objectValue[k] === 'false') {
+            data = 'Нет';
+        } else if (!objectValue[k] && typeof objectValue[k] === 'object') {
+            data = 'Нет';
+        } else {
+            data = objectValue[k]
+        }
+
+        temp.push({text: data,callback_data: 'опрос.'+objectKey+'.'+objectValue[k]});
+        if((k+1) % 4 === 0) {
+            arrayButtons.push(temp);
+            temp = []
+        } else if(k+1 === objectValue.length ) {
+            arrayButtons.push(temp)
+        }
+    }
+    return arrayButtons;
+}
+
+
 //для расчета стоимости по фото
 bot.on('contact', (msg) => {
     console.log(msg);
@@ -186,9 +220,9 @@ function checkAndPush(data) {
     if (previousMenuList[previousMenuList.length-1] !== data && previousMenu !== data) {
         previousMenuList.push(data)
     }
-    // console.log("[list]", previousMenuList);
-    // console.log("[last]", previousMenu);
-    // console.log("--------------");
+    console.log("[list]", previousMenuList);
+    console.log("[last]", previousMenu);
+    console.log("--------------");
 }
 
 bot.on('text', (msg) => {
@@ -361,12 +395,10 @@ bot.on("callback_query", (msg) => {
             'Доставка 🚚\n' +
             '\nДоставка воздушных шаров осуществляется ежедневно и круглосуточно. Минимальная сумма заказа - 1000 руб. (без учета стоимости доставки).\n' +
             'С 9.00 до 22.00 стоимость доставки в г. Казани - 250 рублей.\n' +
-            'С 9.00 до 22.00 стоимость доставки в г. Иннополис - 100 рублей.\n' +
             '\nДоставка до пункта выдачи по одному из адресов осуществляется - бесплатно' +
             '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской' +
             '\n🎯Казань ул. Ямашева д.103​, пункт выдачи' +
             '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи' +
-            '\n🎯Иннополис ул. ​Спортивная, д.132 пункт выдачи' +
             '\n\nМы доставляем шары в часовом интервале от вашего времени, т.е. если заказываете шары к определенному времени то от этого времени + - 30 мин. ',
             {
                 chat_id: chatId,
@@ -380,8 +412,7 @@ bot.on("callback_query", (msg) => {
             'Список адресов пунктов выдачи воздушных шаров: \n' +
             '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской ' +
             '\n🎯Казань ул. Ямашева д.103​, пункт выдачи ' +
-            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ' +
-            '\n🎯Иннополис ул. ​Спортивная, д.132 пункт выдачи',
+            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -538,13 +569,12 @@ bot.on("callback_query", (msg) => {
         checkAndPush("Воздушные шары опрос");
 
     } else if (interviewAnswer[0] === "опрос") {
+        console.log(interviewAnswer);
         interview();
 
     } else if (interviewAnswer[0] === "Добавить в корзину ➕") {
         itemListInCart.push(newAddingBalloon);
     }
-
-
 
 
     //опрос покупателя по часто повторяющимся справшиваемым вопросам по шарам
