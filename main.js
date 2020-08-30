@@ -24,7 +24,6 @@ const metalicColorsKeyboard = keyboard.metalicColorsKeyboard();
 const pastelColorsKeyboard = keyboard.pastelColorsKeyboard();
 
 
-
 //'+`${imageLinks.balloonWithTextImg}`+'
 const imageLinks = {
     mainMenuImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1579467751/TelegramBotSharoladya/%D0%93%D1%80%D1%83%D0%BF%D0%BF%D0%B0_1%D0%B0-light_fwbv3n.png">Шароландия</a>',
@@ -46,19 +45,32 @@ const imageLinks = {
     foilFormImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1580056744/TelegramBotSharoladya/foil_form_without_pain_obcx82.png">Форма шаров без рисунком</a>',
 
 };
-const socialLinks = {
-    vk:{
-        name: 'VKontakte: ',
-        link:''
+const customer = {
+    name: 'Sharoladiya',
+    offices: {
+        one: { adress: 'Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской', time: '' },
+        two: { adress: 'Казань ул. Ямашева д.103​, пункт выдачи', time: '' },
+        three: { adress: 'Казань ул. ​Альберта Камалеева д.28​, пункт выдачи', time: '' },
     },
-    inst:{
-        name: 'Instagram: ',
-        link: '<a href="https://www.instagram.com/sharolandiya_kzn/">sharolandiya_kzn</a>'
+    phoneDefault: '8(917)870-83-70',
+    socialLinks: {
+        vk:{
+            name: 'VKontakte: ',
+            link:''
+        },
+        inst:{
+            name: 'Instagram: ',
+            link: '<a href="https://www.instagram.com/sharolandiya_kzn/">sharolandiya_kzn</a>'
+        },
     },
+    adminChatID: '1875888'
 }
-
+const defaultUser = {
+    name: 'unset',
+    adress: 'unset',
+    phone: 'unset'
+}
 let photoList = [];
-const adminChatID = '1875888';
 let previousMenuList = [];
 let previousMenu = '';
 let arrayValuesForEachKey = [];
@@ -182,7 +194,7 @@ bot.on('contact', (msg) => {
 
 
     bot.sendMessage(
-        adminChatID,
+        customer.adminChatID,
         "<b>Босс у нас новый клиент!</b> \nПросит сосчитать стоимость по фото." + `\n\n<b>ФИО:</b> ${fromName} ${fromLastName} \n<b>Ник телеграмм:</b> ${fromUsername} \n<b>Телефон:</b> ${fromContact}`,
         {parse_mode: 'HTML'},
     );
@@ -231,8 +243,6 @@ function checkAndPush(data) {
         previousMenuList.push(data)
     }
     console.log("[list]", previousMenuList);
-    console.log("[last]", previousMenu);
-    console.log("--------------");
 }
 
 bot.on('text', (msg) => {
@@ -251,7 +261,7 @@ bot.on('text', (msg) => {
     if (msg.text.toString() === "Шары 🎈" || msg.text.toString() === "🎈" || msg.text.toString() === "/balloons" || msg.text.toString() === "Шары") {
         bot.sendMessage(
             chatId,
-            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать к вашим услугам каталог для ознакомления с ценами. Здесь вы можете узнать сколько будет стоить конктретный шарик, выбрав его по параметрам или прислав нам фото композиции для подсчета стоимости. Приятных покупок!`,
+            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать к вашим услугам каталог для ознакомления с ценами. Здесь вы можете узнать сколько будет стоить конктретный шарик, выбрав его по параметрам или прислать нам фото композиции для подсчета стоимости. Приятных покупок!`,
             {
                 reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
@@ -263,14 +273,14 @@ bot.on('text', (msg) => {
         bot.sendMessage(
             chatId,
             `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать, заходите так же к нам в социальных сетях!` +
-            `\n${socialLinks.inst.name} ${socialLinks.inst.link}` +
-            `\n${socialLinks.vk.name} ${socialLinks.vk.link}`,
+            `\n${customer.socialLinks.inst.name} ${customer.socialLinks.inst.link}` +
+            `\n${customer.socialLinks.vk.name} ${customer.socialLinks.vk.link}`,
             {
                 reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
             }
         );
-        checkAndPush("Шары 🎈");
+        checkAndPush("Соц сети 👤");
 
     } else if (msg.text.toString() === "Отмена") {
         bot.sendMessage(
@@ -279,7 +289,7 @@ bot.on('text', (msg) => {
             {reply_markup: keyboardDefault}
         );
     } else {
-        console.log('Wrong type of message')
+        console.log('Wrong type of message');
         bot.sendMessage(
             chatId,
             `${chatOpponent}, к сожалению в моей базе данных нет доступных команд по вашему слову `+`${msg.text.toString()}`+' \n\nВарианты доступных текстовых команд:\nstart \nШары 🎈 \nСоц сети 👤',
@@ -289,7 +299,6 @@ bot.on('text', (msg) => {
 });
 
 bot.on("callback_query", (msg) => {
-
     // console.log(msg);
     const chatValue = msg.message.chat;
     const chatId = chatValue.id;
@@ -305,12 +314,12 @@ bot.on("callback_query", (msg) => {
     //если приходит колбек назад запускаю метод поп и меняю колбек
 
     if (answer === '⬅ Назад') {
-        if (previousMenuList.length >= 2) {
+        console.log(previousMenuList);
+        if (previousMenuList.length > 1) {
             previousMenuList.pop();
 
-            if (previousMenuList[previousMenuList.length-1] === 'Фольги-нные шары, фигуры опрос') {
-                previousMenuList.pop();
-            } else if (previousMenuList[previousMenuList.length-1] === 'Воздушные шары опрос') {
+            if (previousMenuList[previousMenuList.length-1] === 'Фольги-нные шары, фигуры опрос' ||
+                previousMenuList[previousMenuList.length-1] === 'Воздушные шары опрос') {
                 previousMenuList.pop();
             }
 
@@ -330,17 +339,29 @@ bot.on("callback_query", (msg) => {
         // console.log(newAddingBalloon[interviewAnswer[1]],'----- in to object')
     }
 
-
     if (answer === "Шары 🎈") {
-        bot.editMessageText(
-            '<a href='+`${imageLinks.mainMenuImg}`+'>Шароландия</a>' + `\n${chatOpponent}, вы нажали шары вводная общая информация о услугам`,
+        bot.sendMessage(
+            chatId,
+            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать к вашим услугам каталог для ознакомления с ценами. Здесь вы можете узнать сколько будет стоить конктретный шарик, выбрав его по параметрам или прислать нам фото композиции для подсчета стоимости. Приятных покупок!`,
             {
-                chat_id: chatId,
-                message_id: messageId,
                 reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
-            });
+            }
+        );
         checkAndPush("Шары 🎈");
+
+    } else if (answer === "Соц сети 👤") {
+        bot.sendMessage(
+            chatId,
+            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать, заходите так же к нам в социальных сетях!` +
+            `\n${socialLinks.inst.name} ${socialLinks.inst.link}` +
+            `\n${socialLinks.vk.name} ${socialLinks.vk.link}`,
+            {
+                reply_markup: keyboardBalloons,
+                parse_mode: "HTML"
+            }
+        );
+        checkAndPush("Соц сети 👤");
 
     } else if (answer === "Каталог и цены 🎁") {
         bot.editMessageText(
@@ -382,7 +403,7 @@ bot.on("callback_query", (msg) => {
                     () => {
                         for (let i = 0; i < photoList.length; i++) {
                             let fileId = photoList[i];
-                            bot.sendPhoto(adminChatID, fileId);
+                            bot.sendPhoto(customer.adminChatID, fileId);
                         }
                         photoList = [];
                     },
@@ -417,9 +438,9 @@ bot.on("callback_query", (msg) => {
             '\nДоставка воздушных шаров осуществляется ежедневно и круглосуточно. Минимальная сумма заказа - 1000 руб. (без учета стоимости доставки).\n' +
             'С 9.00 до 22.00 стоимость доставки в г. Казани - 250 рублей.\n' +
             '\nДоставка до пункта выдачи по одному из адресов осуществляется - бесплатно' +
-            '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской' +
-            '\n🎯Казань ул. Ямашева д.103​, пункт выдачи' +
-            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи' +
+            `\n🎯 ${customer.offices.one.adress}`+
+            `\n🎯 ${customer.offices.two.adress}` +
+            `\n🎯 ${customer.offices.three.adress}` +
             '\n\nМы доставляем шары в часовом интервале от вашего времени, т.е. если заказываете шары к определенному времени то от этого времени + - 30 мин. ',
             {
                 chat_id: chatId,
@@ -431,10 +452,10 @@ bot.on("callback_query", (msg) => {
     } else if (answer === "Адреса") {
         bot.editMessageText(
             'Список адресов пунктов выдачи воздушных шаров: \n' +
-            '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской ' +
-            '\n🎯Казань ул. Ямашева д.103​, пункт выдачи ' +
-            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ' +
-            '\n\n📲 8(917)870-83-70',
+            `\n🎯 ${customer.offices.one.adress}`+
+            `\n🎯 ${customer.offices.two.adress}` +
+            `\n🎯 ${customer.offices.three.adress}`+
+            `\n\n📲 ${customer.phoneDefault}`,
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -486,11 +507,30 @@ bot.on("callback_query", (msg) => {
 
     } else if (answer === "Мой кабинет 💼") {
         bot.editMessageText(
-            `Мой кабинет`,
+            `Личный клиента: ${chatOpponent}` +
+            '\nВся полезная информация по вашим заказам и не только 🧾' +
+            `\nАдрес доставки: ${defaultUser.adress}` +
+            `\nКонтактный номер: ${defaultUser.phone}`,
             {
                 chat_id: chatId,
                 message_id: messageId,
                 reply_markup: profileKeyboard
+            });
+        checkAndPush("Мой кабинет 💼");
+
+    }  else if (answer === "Как заказать?") {
+        bot.editMessageText(
+            `Способы заказа:` +
+            '\nБот работает в тестовом режиме, доступен функционал ознакомления с ценами и услугам компании.' +
+            `\n\nДля заказа вы можете связаться через приложение отвив нам фото понравившийся вам композиции шаров.` +
+            `\n\nЛибо связаться с нами одим из следующих способов` +
+            `\nСоц сети: 👤 ${customer.socialLinks.inst.link}`+
+            `\nКонтактный номер: 📲 ${customer.phoneDefault}`,
+            {
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: profileKeyboard,
+                parse_mode: "HTML"
             });
         checkAndPush("Мой кабинет 💼");
 
