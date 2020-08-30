@@ -9,7 +9,7 @@ const balloons = "Шары 🎈";
 function keyboardDefault() {
     return {
         keyboard: [
-            [{text: balloons}, {text: "Торты 🎂"}]
+            [{text: balloons}, {text: "Соц сети 👤"}]
         ],
         resize_keyboard: true,
         one_time_keyboard: true

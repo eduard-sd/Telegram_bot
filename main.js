@@ -46,6 +46,16 @@ const imageLinks = {
     foilFormImg: '<a href="https://res.cloudinary.com/sharolandiya/image/upload/v1580056744/TelegramBotSharoladya/foil_form_without_pain_obcx82.png">Форма шаров без рисунком</a>',
 
 };
+const socialLinks = {
+    vk:{
+        name: 'VKontakte: ',
+        link:''
+    },
+    inst:{
+        name: 'Instagram: ',
+        link: '<a href="https://www.instagram.com/sharolandiya_kzn/">sharolandiya_kzn</a>'
+    },
+}
 
 let photoList = [];
 const adminChatID = '1875888';
@@ -230,7 +240,7 @@ bot.on('text', (msg) => {
     const chatId = msg.chat.id;
     const chatOpponent = chatValue.first_name ? chatValue.first_name : "Дорогой клиент";
 
-    if (msg.text.toString() === "/start") {
+    if (msg.text.toString() === "/start" || msg.text.toString() === "start") {
         bot.sendMessage(
             chatId,
             `${chatOpponent}, добрый день! Вас приветсвует автоматичекский помошник в подготовке праздников. Прошу сделать выбор, что вас интересует?`,
@@ -238,10 +248,10 @@ bot.on('text', (msg) => {
         )
     }
 
-    if (msg.text.toString() === "Шары 🎈") {
+    if (msg.text.toString() === "Шары 🎈" || msg.text.toString() === "🎈" || msg.text.toString() === "/balloons" || msg.text.toString() === "Шары") {
         bot.sendMessage(
             chatId,
-            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать к вашим услугам каталог и личный кабинет приятных покупок!`,
+            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать к вашим услугам каталог для ознакомления с ценами. Здесь вы можете узнать сколько будет стоить конктретный шарик, выбрав его по параметрам или прислав нам фото композиции для подсчета стоимости. Приятных покупок!`,
             {
                 reply_markup: keyboardBalloons,
                 parse_mode: "HTML"
@@ -249,7 +259,18 @@ bot.on('text', (msg) => {
         );
         checkAndPush("Шары 🎈");
 
-    } else if (msg.text.toString() === "Торты 🎂") {
+    } else if (msg.text.toString() === "Соц сети 👤" || msg.text.toString() === "👤" || msg.text.toString() === "Соц сети" || msg.text.toString() === "/socialnets") {
+        bot.sendMessage(
+            chatId,
+            `${imageLinks.mainMenuImg}\n${chatOpponent}, добро пожаловать, заходите так же к нам в социальных сетях!` +
+            `\n${socialLinks.inst.name} ${socialLinks.inst.link}` +
+            `\n${socialLinks.vk.name} ${socialLinks.vk.link}`,
+            {
+                reply_markup: keyboardBalloons,
+                parse_mode: "HTML"
+            }
+        );
+        checkAndPush("Шары 🎈");
 
     } else if (msg.text.toString() === "Отмена") {
         bot.sendMessage(
@@ -261,7 +282,7 @@ bot.on('text', (msg) => {
         console.log('Wrong type of message')
         bot.sendMessage(
             chatId,
-            `${chatOpponent}, к сожалению в моей базе данных нет доступных команд по вашему слову `+`${msg.text.toString()}`+' \n\nВарианты доступных команд:\n/Шары 🎈\n/start',
+            `${chatOpponent}, к сожалению в моей базе данных нет доступных команд по вашему слову `+`${msg.text.toString()}`+' \n\nВарианты доступных текстовых команд:\nstart \nШары 🎈 \nСоц сети 👤',
             {reply_markup: keyboardDefault}
         );
     }
@@ -412,7 +433,8 @@ bot.on("callback_query", (msg) => {
             'Список адресов пунктов выдачи воздушных шаров: \n' +
             '\n🎯Казань ​ул. ​Солдатская д.8​, 402 офис, БЦ На Солдатской ' +
             '\n🎯Казань ул. Ямашева д.103​, пункт выдачи ' +
-            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ',
+            '\n🎯Казань ул. ​Альберта Камалеева д.28​, пункт выдачи ' +
+            '\n\n📲 8(917)870-83-70',
             {
                 chat_id: chatId,
                 message_id: messageId,
@@ -584,10 +606,10 @@ bot.on("callback_query", (msg) => {
         console.log(!newAddingBalloon.color);
 
         filteredSelector = selectorBuilder(currentCategory);//отправить объект нового шара для выборки
-        // console.log(filteredSelector);
+        console.log(filteredSelector);
         dataBaseQuery(filteredSelector, function (result) {
             filteredByConstructor = result.slice();
-            // console.log(filteredByConstructor);
+            console.log(filteredByConstructor);
             arrayValuesForEachKey = arrayFromPriceListKeys(filteredByConstructor);
 
             if (arrayValuesForEachKey.size_inches &&
@@ -792,7 +814,6 @@ bot.on("polling_error", (err) => console.log(err));
 //подключение к дб
 function dataBaseQuery(selector, dataBQ) {
     pool.query(selector, (err, res) => {
-
         try {
             dataBQ(res.rows);
             console.log("connected to database");
